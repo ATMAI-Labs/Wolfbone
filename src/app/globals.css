@@ -1117,3 +1117,31 @@
 .composition-unavailable [data-slot='button'] {
   align-self: flex-start;
 }
+.starting-example {
+  margin-top: 15px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.starting-example summary {
+  color: var(--signal);
+}
+.starting-example p {
+  font-size: 12px;
+  margin: 12px 0;
+}
+.starting-example ol {
+  list-style: decimal;
+  padding-left: 18px;
+  margin-top: 9px;
+}
+.starting-example li {
+  margin-bottom: 12px;
+}
+@media (max-width: 700px) {
+  .workspace-explore-link {
+    display: none !important;
+  }
+  .mobile-library .library-top:has(.starting-example) {
+    display: block;
+  }
+}

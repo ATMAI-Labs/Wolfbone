@@ -1,6 +1,7 @@
 'use client';
 // SPDX-License-Identifier: MIT
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'motion/react';
 import {
@@ -43,6 +44,8 @@ import { ConceptsDialog } from './concepts-dialog';
 import { CompositionDialog } from './composition-dialog';
 import { ComparisonResult } from './comparison-result';
 import { MappingEditor, signature, elementLabel } from './mapping-editor';
+import type { Playground } from '@/lib/library/playgrounds';
+import { STORAGE_KEY } from '@/lib/workspace/archive';
 const FunctionCanvas = dynamic(() => import('./function-canvas'), {
   ssr: false,
   loading: () => (
@@ -76,10 +79,25 @@ function ToolButton({
     </Tooltip>
   );
 }
-export default function Workspace() {
-  const workspace = useWorkspace();
+export default function Workspace({ playground }: { playground?: Playground }) {
+  const initialPair = playground?.composition
+    ? {
+        first: playground.composition.firstFunctionId,
+        second: playground.composition.secondFunctionId,
+      }
+    : playground
+      ? {
+          first: playground.document.functions[0]?.id ?? '',
+          second: playground.document.functions[1]?.id ?? '',
+        }
+      : { first: 'f', second: 'g' };
+  const initialSelected = playground?.document.functions.at(-1)?.id ?? 'h';
+  const workspace = useWorkspace(
+    playground?.document,
+    playground ? `${STORAGE_KEY}.example.${playground.id}` : STORAGE_KEY,
+  );
   const { document, positions, setDocument, setPositions } = workspace;
-  const [selectedId, setSelectedId] = useState('h');
+  const [selectedId, setSelectedId] = useState(initialSelected);
   const selected = document.functions.find((f) => f.id === selectedId) ?? document.functions[0];
   const [tab, setTab] = useState('diagram');
   const [viewMode, setViewMode] = useState<'all' | 'selected' | 'composite'>('all');
@@ -87,7 +105,7 @@ export default function Workspace() {
   const [conceptsOpen, setConceptsOpen] = useState(false);
   const [composeOpen, setComposeOpen] = useState(false);
   const [compareActive, setCompareActive] = useState(false);
-  const [pair, setPair] = useState({ first: 'f', second: 'g' });
+  const [pair, setPair] = useState(initialPair);
   const first = document.functions.find((f) => f.id === pair.first);
   const second = document.functions.find((f) => f.id === pair.second);
   const composed = first && second ? composeFunctions(first, second, document.sets) : null;
@@ -222,8 +240,8 @@ export default function Workspace() {
   }, [workspace.undo, workspace.redo, exportWorkspace]);
   function reset() {
     workspace.restoreExample();
-    setSelectedId('h');
-    setPair({ first: 'f', second: 'g' });
+    setSelectedId(initialSelected);
+    setPair(initialPair);
     setSelectedSetId(null);
     setTrace(null);
     setViewMode('all');
@@ -236,6 +254,21 @@ export default function Workspace() {
         <div className="library-top">
           <h2>In this workspace</h2>
           <p>Finite collections & functions</p>
+          {playground && (
+            <details className="starting-example">
+              <summary>About this starting example</summary>
+              <p>{playground.context}</p>
+              <strong>Things to try</strong>
+              <ol>
+                {playground.tryThis.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+              <p>
+                These notes describe the starting example. Your edits can change its properties.
+              </p>
+            </details>
+          )}
         </div>
         <section className="library-section">
           <h3>Collections</h3>
@@ -323,6 +356,13 @@ export default function Workspace() {
           </Button>
         </section>
         <div className="library-bottom">
+          <Button variant="ghost" asChild>
+            <Link href="/explore">
+              <BookOpen data-icon="inline-start" />
+              Explore mathematics
+              <ArrowUpRight data-icon="inline-end" />
+            </Link>
+          </Button>
           <Button variant="ghost" onClick={() => setConceptsOpen(true)}>
             <BookOpen data-icon="inline-start" />
             Explore concepts
@@ -363,6 +403,12 @@ export default function Workspace() {
             </div>
             <span className="workspace-name">{document.title}</span>
             <div className="header-actions">
+              <Button variant="outline" asChild className="workspace-explore-link">
+                <Link href="/explore">
+                  <BookOpen />
+                  <span className="button-word">Explore mathematics</span>
+                </Link>
+              </Button>
               <ToolButton
                 label={
                   workspace.canUndo ? 'Undo last change (⌘Z / Ctrl+Z)' : 'No change to undo yet'

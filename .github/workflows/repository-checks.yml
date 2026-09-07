@@ -32,6 +32,8 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Verify the bundled mathematics corpus
+        run: npm run library:verify
       - name: Test the finite core and workspace archive
         run: npm run test
       - name: Check application types

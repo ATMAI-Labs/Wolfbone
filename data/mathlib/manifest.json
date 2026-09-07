@@ -1,0 +1,481 @@
+{
+  "format": "wolfbone.mathlib-metadata",
+  "version": 1,
+  "revision": "71a80585ee495fc24472fd0eaffc89d94e4fd8d6",
+  "sourceUrl": "https://leanprover-community.github.io/mathlib4_docs/declarations/declaration-data.bmp",
+  "sourceSha256": "9577ef2e19c91d54554a0eadd433e3a7f4e0ee67c46b1e606b7c014db2dfde25",
+  "sourceBytes": 67257806,
+  "importedAt": "2026-09-07T05:24:34.922Z",
+  "documentationBaseUrl": "https://leanprover-community.github.io/mathlib4_docs/",
+  "sourceBaseUrl": "https://github.com/leanprover-community/mathlib4/blob/71a80585ee495fc24472fd0eaffc89d94e4fd8d6/",
+  "licence": "Apache-2.0",
+  "sourceCopyright": "The mathlib contributors and respective source-file copyright holders",
+  "scope": "All Mathlib declaration names and kinds in the pinned documentation index, plus direct module import relationships. Metadata only; no imported proof objects or local Lean verification.",
+  "declarationCount": 321329,
+  "moduleCount": 8489,
+  "kinds": [
+    {
+      "id": "axiom",
+      "count": 0
+    },
+    {
+      "id": "class",
+      "count": 1993
+    },
+    {
+      "id": "ctor",
+      "count": 4660
+    },
+    {
+      "id": "def",
+      "count": 43724
+    },
+    {
+      "id": "inductive",
+      "count": 318
+    },
+    {
+      "id": "instance",
+      "count": 30317
+    },
+    {
+      "id": "opaque",
+      "count": 329
+    },
+    {
+      "id": "structure",
+      "count": 1640
+    },
+    {
+      "id": "theorem",
+      "count": 238348
+    }
+  ],
+  "areas": [
+    {
+      "id": "algebra",
+      "label": "Algebra",
+      "declarationCount": 57859,
+      "moduleCount": 1360,
+      "file": "areas/algebra.json.gz"
+    },
+    {
+      "id": "algebraicgeometry",
+      "label": "Algebraic geometry",
+      "declarationCount": 6143,
+      "moduleCount": 140,
+      "file": "areas/algebraicgeometry.json.gz"
+    },
+    {
+      "id": "algebraictopology",
+      "label": "Algebraic topology",
+      "declarationCount": 4996,
+      "moduleCount": 163,
+      "file": "areas/algebraictopology.json.gz"
+    },
+    {
+      "id": "analysis",
+      "label": "Analysis",
+      "declarationCount": 29322,
+      "moduleCount": 808,
+      "file": "areas/analysis.json.gz"
+    },
+    {
+      "id": "basic",
+      "label": "Basic",
+      "declarationCount": 2672,
+      "moduleCount": 45,
+      "file": "areas/basic.json.gz"
+    },
+    {
+      "id": "categorytheory",
+      "label": "Category theory",
+      "declarationCount": 43779,
+      "moduleCount": 1114,
+      "file": "areas/categorytheory.json.gz"
+    },
+    {
+      "id": "combinatorics",
+      "label": "Combinatorics",
+      "declarationCount": 8198,
+      "moduleCount": 200,
+      "file": "areas/combinatorics.json.gz"
+    },
+    {
+      "id": "computability",
+      "label": "Computability",
+      "declarationCount": 1864,
+      "moduleCount": 29,
+      "file": "areas/computability.json.gz"
+    },
+    {
+      "id": "condensed",
+      "label": "Condensed mathematics",
+      "declarationCount": 430,
+      "moduleCount": 34,
+      "file": "areas/condensed.json.gz"
+    },
+    {
+      "id": "control",
+      "label": "Control and computation",
+      "declarationCount": 608,
+      "moduleCount": 25,
+      "file": "areas/control.json.gz"
+    },
+    {
+      "id": "data",
+      "label": "Numbers and data structures",
+      "declarationCount": 23395,
+      "moduleCount": 655,
+      "file": "areas/data.json.gz"
+    },
+    {
+      "id": "deprecated",
+      "label": "Deprecated compatibility modules",
+      "declarationCount": 0,
+      "moduleCount": 1,
+      "file": "areas/deprecated.json.gz"
+    },
+    {
+      "id": "dynamics",
+      "label": "Dynamical systems",
+      "declarationCount": 942,
+      "moduleCount": 34,
+      "file": "areas/dynamics.json.gz"
+    },
+    {
+      "id": "fieldtheory",
+      "label": "Field theory",
+      "declarationCount": 3008,
+      "moduleCount": 85,
+      "file": "areas/fieldtheory.json.gz"
+    },
+    {
+      "id": "geometry",
+      "label": "Geometry",
+      "declarationCount": 6578,
+      "moduleCount": 156,
+      "file": "areas/geometry.json.gz"
+    },
+    {
+      "id": "grouptheory",
+      "label": "Group theory",
+      "declarationCount": 9275,
+      "moduleCount": 169,
+      "file": "areas/grouptheory.json.gz"
+    },
+    {
+      "id": "informationtheory",
+      "label": "Information theory",
+      "declarationCount": 169,
+      "moduleCount": 9,
+      "file": "areas/informationtheory.json.gz"
+    },
+    {
+      "id": "init",
+      "label": "Initial definitions",
+      "declarationCount": 3,
+      "moduleCount": 1,
+      "file": "areas/init.json.gz"
+    },
+    {
+      "id": "lean",
+      "label": "Lean infrastructure",
+      "declarationCount": 292,
+      "moduleCount": 34,
+      "file": "areas/lean.json.gz"
+    },
+    {
+      "id": "linearalgebra",
+      "label": "Linear algebra",
+      "declarationCount": 12981,
+      "moduleCount": 378,
+      "file": "areas/linearalgebra.json.gz"
+    },
+    {
+      "id": "logic",
+      "label": "Logic and functions",
+      "declarationCount": 2371,
+      "moduleCount": 47,
+      "file": "areas/logic.json.gz"
+    },
+    {
+      "id": "measuretheory",
+      "label": "Measure theory",
+      "declarationCount": 12786,
+      "moduleCount": 337,
+      "file": "areas/measuretheory.json.gz"
+    },
+    {
+      "id": "modeltheory",
+      "label": "Model theory",
+      "declarationCount": 1774,
+      "moduleCount": 34,
+      "file": "areas/modeltheory.json.gz"
+    },
+    {
+      "id": "numbertheory",
+      "label": "Number theory",
+      "declarationCount": 7111,
+      "moduleCount": 248,
+      "file": "areas/numbertheory.json.gz"
+    },
+    {
+      "id": "order",
+      "label": "Order and lattices",
+      "declarationCount": 20222,
+      "moduleCount": 317,
+      "file": "areas/order.json.gz"
+    },
+    {
+      "id": "probability",
+      "label": "Probability",
+      "declarationCount": 4322,
+      "moduleCount": 140,
+      "file": "areas/probability.json.gz"
+    },
+    {
+      "id": "representationtheory",
+      "label": "Representation theory",
+      "declarationCount": 2203,
+      "moduleCount": 44,
+      "file": "areas/representationtheory.json.gz"
+    },
+    {
+      "id": "ringtheory",
+      "label": "Ring theory",
+      "declarationCount": 19869,
+      "moduleCount": 727,
+      "file": "areas/ringtheory.json.gz"
+    },
+    {
+      "id": "root",
+      "label": "Root",
+      "declarationCount": 0,
+      "moduleCount": 1,
+      "file": "areas/root.json.gz"
+    },
+    {
+      "id": "settheory",
+      "label": "Set theory",
+      "declarationCount": 3486,
+      "moduleCount": 56,
+      "file": "areas/settheory.json.gz"
+    },
+    {
+      "id": "tactic",
+      "label": "Proof tactics",
+      "declarationCount": 5392,
+      "moduleCount": 370,
+      "file": "areas/tactic.json.gz"
+    },
+    {
+      "id": "testing",
+      "label": "Testing infrastructure",
+      "declarationCount": 36,
+      "moduleCount": 3,
+      "file": "areas/testing.json.gz"
+    },
+    {
+      "id": "topology",
+      "label": "Topology",
+      "declarationCount": 28972,
+      "moduleCount": 693,
+      "file": "areas/topology.json.gz"
+    },
+    {
+      "id": "util",
+      "label": "Utilities",
+      "declarationCount": 271,
+      "moduleCount": 32,
+      "file": "areas/util.json.gz"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "modules.json",
+      "bytes": 3731360,
+      "sha256": "e34668da9fdf491afc46c24e276661960ea4d1b59977789d66ef351484e7eeeb"
+    },
+    {
+      "file": "LICENSE.mathlib.txt",
+      "bytes": 11357,
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1"
+    },
+    {
+      "file": "ATTRIBUTION.txt",
+      "bytes": 940,
+      "sha256": "a8c8279a83bf22a1d172f3bd726a109cec8221b227fb45f62826b8f60b12a0f6"
+    },
+    {
+      "file": "areas/algebra.json.gz",
+      "bytes": 321503,
+      "sha256": "50cea87c66fa210ba22381b013987dfb978bc670dfdc61e113be70aba8ff7262"
+    },
+    {
+      "file": "areas/algebraicgeometry.json.gz",
+      "bytes": 40603,
+      "sha256": "5962ac86c4a3f7731444fbdbd9c34be1319e2729e2a5b308e1d61c61877a6c71"
+    },
+    {
+      "file": "areas/algebraictopology.json.gz",
+      "bytes": 30461,
+      "sha256": "36e794197d113a7cd0fe2dad9ee14c799ebe028d73ce1108d6109a9868d130c1"
+    },
+    {
+      "file": "areas/analysis.json.gz",
+      "bytes": 179434,
+      "sha256": "06c383ae7aebb6a4f0e1ca63f8c8662c1de6e524f6f0f87f15f9cd960e96d863"
+    },
+    {
+      "file": "areas/basic.json.gz",
+      "bytes": 13784,
+      "sha256": "8e72d82ab94fb3716156594a69583f7b495b2369c4f655ac0dacd967ee598bfd"
+    },
+    {
+      "file": "areas/categorytheory.json.gz",
+      "bytes": 264635,
+      "sha256": "069100185527ce825984b2aa47d4e82ebaa315675affba6075d6eaa9734a9c85"
+    },
+    {
+      "file": "areas/combinatorics.json.gz",
+      "bytes": 50229,
+      "sha256": "a436098a047083f40ef50c45add7553230743ddae54a67ee2dfb0d30bd70c997"
+    },
+    {
+      "file": "areas/computability.json.gz",
+      "bytes": 9807,
+      "sha256": "da1d4dff1a36b7f7829c4c25986ca2e23c838320347c4eb3a0d77ce4b349c293"
+    },
+    {
+      "file": "areas/condensed.json.gz",
+      "bytes": 3323,
+      "sha256": "5d5530a42149afdd718eda63d61ffa1f11318c878af8c9dd05a6087e3763b2e8"
+    },
+    {
+      "file": "areas/control.json.gz",
+      "bytes": 3336,
+      "sha256": "ed5722cd524013eb1d697fbddf77cb57c4f8eea3a662141409b1b5999b23a334"
+    },
+    {
+      "file": "areas/data.json.gz",
+      "bytes": 127375,
+      "sha256": "154de56e93cf625619256570e063451d664f5c2dc4b8a367acf89d3779d1bb62"
+    },
+    {
+      "file": "areas/deprecated.json.gz",
+      "bytes": 22,
+      "sha256": "6731668a37f6a3ed10d77860e21c7ba693c377a061571ffa58564d1d699c1798"
+    },
+    {
+      "file": "areas/dynamics.json.gz",
+      "bytes": 6111,
+      "sha256": "83214305049960715f9b186dd76afb8b1e598f0fbf6480d45c45e4f718941a56"
+    },
+    {
+      "file": "areas/fieldtheory.json.gz",
+      "bytes": 19642,
+      "sha256": "84c38816a6c88ec14f90582eca87deb54615a9ebd210143308920eb3af345fbc"
+    },
+    {
+      "file": "areas/geometry.json.gz",
+      "bytes": 40960,
+      "sha256": "bd08e71051f81b817317ec01dadb6c776e555abeccde5bdf4ede360471f6adb6"
+    },
+    {
+      "file": "areas/grouptheory.json.gz",
+      "bytes": 57093,
+      "sha256": "b7c2b513d4cae270640d0e9f426fc71caf66c03094418a85c5888722e3c33d9f"
+    },
+    {
+      "file": "areas/informationtheory.json.gz",
+      "bytes": 1235,
+      "sha256": "b5c49f4efa6b2d5b6dc192a33014163d5fc222d7dc4e01f28a44b066aae5c48c"
+    },
+    {
+      "file": "areas/init.json.gz",
+      "bytes": 91,
+      "sha256": "e982dcbc9c7f2d762c0242a79c5e9a29bba32d70d112c712be31cd2d01052689"
+    },
+    {
+      "file": "areas/lean.json.gz",
+      "bytes": 2649,
+      "sha256": "9175851fe35c1e5516f3a8f651688045e5c0ced1f00316222e69d085efec0b89"
+    },
+    {
+      "file": "areas/linearalgebra.json.gz",
+      "bytes": 79724,
+      "sha256": "63ec788feb679d603ffdedeb0245affdbef81acd540cf198ad91c8ef937e5560"
+    },
+    {
+      "file": "areas/logic.json.gz",
+      "bytes": 12695,
+      "sha256": "fe43771d7232a19593f1dd0b0fd332bed5208f1848b60db429e26c4f05dca801"
+    },
+    {
+      "file": "areas/measuretheory.json.gz",
+      "bytes": 80451,
+      "sha256": "0e9a298cd458c24228df06a056dd87f241cdcc462bdacf26d3ca9aa2225109e8"
+    },
+    {
+      "file": "areas/modeltheory.json.gz",
+      "bytes": 11116,
+      "sha256": "746f0a180902cf74e14da696b64ab28a4159804a7995b0c791f7ec41fe3c64f5"
+    },
+    {
+      "file": "areas/numbertheory.json.gz",
+      "bytes": 48977,
+      "sha256": "264dbd3ce8598cb33c476d5cefb40ac76a9bffae5cbb569142c56c339de74df6"
+    },
+    {
+      "file": "areas/order.json.gz",
+      "bytes": 105701,
+      "sha256": "525d88d1427e296b48a505b312f58a5d13ccda8bcb4a02341226ffa360df48e1"
+    },
+    {
+      "file": "areas/probability.json.gz",
+      "bytes": 26281,
+      "sha256": "aa77ad307b6df98e6a89a9494957e8ad33ceb61ef315877a0d04759db79e356a"
+    },
+    {
+      "file": "areas/representationtheory.json.gz",
+      "bytes": 12638,
+      "sha256": "94ec9f75c5d3bdd5807b1f5d4ede06a2b4cd9485c0ee8a617bdd92b1322bfa61"
+    },
+    {
+      "file": "areas/ringtheory.json.gz",
+      "bytes": 132141,
+      "sha256": "470b969b37f879d073b244de91643efe28846d379bc3a78d6da7a2e17beddc78"
+    },
+    {
+      "file": "areas/root.json.gz",
+      "bytes": 22,
+      "sha256": "6731668a37f6a3ed10d77860e21c7ba693c377a061571ffa58564d1d699c1798"
+    },
+    {
+      "file": "areas/settheory.json.gz",
+      "bytes": 18363,
+      "sha256": "2f26aa43f83cf13634ab3b7b762c8823f35193c91010ca7bdf35b0835daed20d"
+    },
+    {
+      "file": "areas/tactic.json.gz",
+      "bytes": 37000,
+      "sha256": "29756fd3424bbfbc16f187fea631cec09f522fbfaad5074e3782192ceb2e6a2c"
+    },
+    {
+      "file": "areas/testing.json.gz",
+      "bytes": 360,
+      "sha256": "be0cfd20638e89b21b1ea74247f2d087093d2f25966944f494afdf9737d6f57d"
+    },
+    {
+      "file": "areas/topology.json.gz",
+      "bytes": 180303,
+      "sha256": "348495f10fb95c9f2b5f0cf5a15877c052a2a856071319412c6a6f2e0c46fa9f"
+    },
+    {
+      "file": "areas/util.json.gz",
+      "bytes": 2409,
+      "sha256": "8ca034110b35e2d606e6573197a42579eafca1d19e12e81acee8edbc83d1737a"
+    }
+  ]
+}

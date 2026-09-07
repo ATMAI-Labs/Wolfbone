@@ -14,7 +14,9 @@
     "build": "next build",
     "start": "next start --hostname 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/lib/math/*.test.ts src/lib/workspace/*.test.ts",
+    "test": "tsx --test src/lib/math/*.test.ts src/lib/workspace/*.test.ts src/lib/library/*.test.ts",
+    "library:verify": "node scripts/import-mathlib.mjs --verify",
+    "library:import": "node scripts/import-mathlib.mjs",
     "test:e2e": "playwright test",
     "format:check": "prettier --check src tests *.ts *.mjs components.json .prettierrc.json"
   },

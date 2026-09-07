@@ -62,7 +62,9 @@ Diagram and table represent one mathematical model, with layout stored separatel
 
 The current diagram uses expanded collection cards and element assignments. A collapsed collection/category overview remains a future representation. A composition's selected source pair is interface state; adding its result stores a finite mapping snapshot, not a persistent derivation linked to source-function IDs.
 
-These decisions do not include full mathlib or MMT integration, an external proof service, or all of mathematics. References and source links preserve a route into existing work without claiming a completed adapter. Rust or another runtime may be considered when a concrete capability or profiling warrants it.
+The preconfigured [mathematics library](architecture/0002-preconfigured-mathematics.md) adds an original foundations map, sixteen editable finite examples, and a local mathlib metadata snapshot containing 321,329 declarations and 8,489 modules. It supports concept search, typed relationship traversal, source-module inspection, and separate saved example workspaces. Imported module dependencies and editorial concept relationships remain distinct.
+
+This is metadata integration: no theorem headers or proof objects are imported, and Lean is not run. Full mathematical-content translation, MMT integration, an external proof service, and comprehensive mathematical coverage remain open work. Rust or another runtime may be considered when a concrete capability or profiling warrants it.
 
 ## Decisions still open beyond the first workspace
 

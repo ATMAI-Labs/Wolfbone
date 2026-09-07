@@ -1,0 +1,13 @@
+mathlib documentation metadata snapshot
+Upstream: https://github.com/leanprover-community/mathlib4/tree/71a80585ee495fc24472fd0eaffc89d94e4fd8d6
+Copyright: the mathlib contributors and respective source-file copyright holders.
+Licence: Apache License 2.0. See LICENSE.mathlib.txt.
+This bundled metadata was extracted, filtered to Mathlib modules, compacted,
+and grouped into areas by Atmai for Wolfbone. It is a modified representation.
+Declaration names, kinds, and module-import relationships are imported from
+the Lean community's doc-gen4 documentation index. Source links preserve
+the route to the original files and their per-file copyright/author notices.
+No theorem bodies, checked proof objects, or declaration proof dependencies
+are included. Documentation links point to a rolling upstream website.
+No upstream NOTICE file was present in the pinned mathlib source tree.
+Wolfbone's original code retains its separate MIT licence.

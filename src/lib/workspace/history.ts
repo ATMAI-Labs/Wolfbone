@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-import { createExample } from '../math/model';
+import { createExample, type MathDocument } from '../math/model';
 import { archiveDocument, decodeArchive, defaultPositions, type WorkspaceArchive } from './archive';
 
 export type WorkspaceHistory = {
@@ -43,8 +43,8 @@ export function decodeImportableArchive(text: string): ArchiveResult {
   return checkCanonicalArchive(decodeArchive(text));
 }
 
-export function createWorkspaceHistory(): WorkspaceHistory {
-  const document = createExample();
+export function createWorkspaceHistory(initialDocument?: MathDocument): WorkspaceHistory {
+  const document = initialDocument ?? createExample();
   const result = validateArchiveCandidate(archiveDocument(document, defaultPositions(document)));
   if (!result.ok) throw new Error('The built-in example is not a valid workspace.');
   return {

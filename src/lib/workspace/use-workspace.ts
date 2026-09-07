@@ -5,15 +5,15 @@ import { type MathDocument } from '../math/model';
 import { STORAGE_KEY, type WorkspaceArchive, type Positions } from './archive';
 import { createWorkspaceHistory, decodeImportableArchive, workspaceReducer } from './history';
 
-export function useWorkspace() {
-  const [history, dispatch] = useReducer(workspaceReducer, undefined, createWorkspaceHistory);
+export function useWorkspace(initialDocument?: MathDocument, storageKey = STORAGE_KEY) {
+  const [history, dispatch] = useReducer(workspaceReducer, initialDocument, createWorkspaceHistory);
   const [ready, setReady] = useState(false);
   const [saveStatus, setSaveStatus] = useState('Opening workspace…');
   const [loadError, setLoadError] = useState('');
   const protectStored = useRef(false);
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(storageKey);
       if (raw) {
         const decoded = decodeImportableArchive(raw);
         if (decoded.ok) dispatch({ type: 'load', value: decoded.value });
@@ -28,7 +28,7 @@ export function useWorkspace() {
       setLoadError('Browser storage is unavailable. You can work here and export a file.');
     }
     setReady(true);
-  }, []);
+  }, [storageKey]);
   useEffect(() => {
     if (!ready) return;
     if (protectStored.current) {
@@ -42,14 +42,14 @@ export function useWorkspace() {
     setSaveStatus('Saving in this browser…');
     const timer = setTimeout(() => {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history.present));
+        localStorage.setItem(storageKey, JSON.stringify(history.present));
         setSaveStatus('Saved in this browser');
       } catch {
         setSaveStatus('Not saved — export to keep your work');
       }
     }, 200);
     return () => clearTimeout(timer);
-  }, [history.present, history.revision, ready]);
+  }, [history.present, history.revision, ready, storageKey]);
   const edit = useCallback((recipe: (current: WorkspaceArchive) => WorkspaceArchive) => {
     dispatch({ type: 'edit', recipe });
   }, []);
@@ -68,7 +68,10 @@ export function useWorkspace() {
   const redo = useCallback(() => {
     dispatch({ type: 'redo' });
   }, []);
-  const restoreExample = useCallback(() => edit(() => createWorkspaceHistory().present), [edit]);
+  const restoreExample = useCallback(
+    () => edit(() => createWorkspaceHistory(initialDocument).present),
+    [edit, initialDocument],
+  );
   const importText = useCallback(
     (text: string) => {
       const result = decodeImportableArchive(text);

@@ -2,6 +2,14 @@
 
 Wolfbone's original code and project documentation are MIT-licensed. The components, icons, and fonts below retain their own licences. This notice records the direct interface dependencies, fonts, and selected test tooling inspected on 7 September 2026; it is not a complete audit of every transitive or development dependency. The lockfile records exact resolved packages. Preserve the licence and notice files supplied with all dependencies when distributing them.
 
+## Imported mathlib metadata
+
+Wolfbone bundles a modified metadata extract from [mathlib](https://github.com/leanprover-community/mathlib4/tree/71a80585ee495fc24472fd0eaffc89d94e4fd8d6), maintained by the Lean community. Copyright belongs to the mathlib contributors and the respective source-file copyright holders. This material retains **Apache License 2.0**; it is not relicensed as MIT.
+
+The extract contains declaration names and kinds, module membership, and direct module imports. Atmai filtered the published documentation index to Mathlib, compacted its records, and grouped them by source area. The [manifest](data/mathlib/manifest.json) records the reviewed revision, source hash, counts, and generated artifact hashes. The complete [upstream licence](data/mathlib/LICENSE.mathlib.txt) and [attribution and modification notice](data/mathlib/ATTRIBUTION.txt) accompany the data. No upstream NOTICE file was present in the pinned source tree. Source links retain a route to per-file author and copyright notices.
+
+The original Wolfbone explanations, relationship map, importer, interface, and editable examples remain under Wolfbone's MIT licence. Upstream theorem statements and proof objects are not included in this metadata snapshot.
+
 ## MIT components
 
 The MIT permission and disclaimer reproduced below apply to the listed components with their respective copyright notices. shadcn also supplies the basis for generated interface components.

@@ -71,6 +71,7 @@ Node.js 24 or newer and npm. Install the development tools and run the checks:
 ```sh
 npm ci
 npm run test
+npm run library:verify
 npm run typecheck
 npm run build
 npx playwright install chromium
