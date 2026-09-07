@@ -1,0 +1,27 @@
+name: Problem report
+description: Report something that is broken, unclear, or inaccessible.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Plain language is welcome. Please describe screenshots or diagrams in text too.
+        For security-sensitive reports, follow SECURITY.md instead of posting details here.
+  - type: textarea
+    id: location
+    attributes:
+      label: Where does the problem occur?
+      description: Link to a page, file, or example, and explain how to encounter the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened, and what would you expect?
+      description: Include any accessibility barrier or confusing behaviour you noticed.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: If relevant, include the revision, browser, device, or assistive tool used. Omit private information.

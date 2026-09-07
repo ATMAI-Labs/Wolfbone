@@ -1,0 +1,19 @@
+{
+  "name": "wolfbone-repository-tools",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Documentation and repository checks for Wolfbone; no application runtime is selected.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "check": "markdownlint-cli2 && node scripts/check-content.mjs && git diff --check && git diff --cached --check"
+  },
+  "devDependencies": {
+    "markdown-it": "15.0.1",
+    "markdownlint-cli2": "0.23.2",
+    "yaml": "2.9.0"
+  }
+}

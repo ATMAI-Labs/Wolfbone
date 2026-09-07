@@ -1,0 +1,24 @@
+name: Idea or question
+description: Explore a possibility, ask a question, or suggest an improvement.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You do not need a finished design or formal notation. Examples and descriptions of diagrams are welcome.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to explore?
+      description: Describe your question or idea, and what prompted it.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example or useful outcome
+      description: Show a situation where this would help, or describe what you want to understand or do.
+  - type: textarea
+    id: connections
+    attributes:
+      label: Related work or open questions
+      description: Add sources, related issues, possible approaches, or uncertainties if you have them.

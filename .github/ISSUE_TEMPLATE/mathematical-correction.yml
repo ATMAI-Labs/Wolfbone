@@ -1,0 +1,26 @@
+name: Mathematical correction
+description: Flag an incorrect claim, missing assumption, or misleading representation.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Plain-language reasoning and visual examples are welcome. A complete proof is not required to raise a concern.
+  - type: textarea
+    id: location
+    attributes:
+      label: Which claim or representation needs attention?
+      description: Link to the definition, statement, diagram, or example. Quote the relevant part if helpful.
+    validations:
+      required: true
+  - type: textarea
+    id: concern
+    attributes:
+      label: What is the concern?
+      description: Describe the suspected error, ambiguity, missing assumption, or lost relationship.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Reasoning, example, or source
+      description: Add a counterexample, proposed correction, or reference if available. Include the relevant context and assumptions.

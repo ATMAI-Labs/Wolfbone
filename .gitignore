@@ -1,0 +1,23 @@
+# Local tools and generated output
+node_modules/
+.cache/
+coverage/
+dist/
+build/
+work/
+
+# Local environments and credentials
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+*.log
+
+# Operating system and editor state
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo
