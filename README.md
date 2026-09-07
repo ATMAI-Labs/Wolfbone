@@ -1,68 +1,132 @@
-# Wolfbone
+# WOLFBONE
 
-*Mathematical thought, across media.*
+**Mathematical thought, across media.**
 
-Wolfbone is an open-source project initiated by Atmai to make mathematical structures, relationships, and constructions accessible across forms of representation.
+An open mathematical workspace for exploring ideas, following relationships, and making constructions. Initiated and maintained by **[Atmai](https://github.com/ATMAI-Labs)**.
 
-We are building a shared map in which people can explore how ideas connect, inspect the rules under which they operate, and construct through representations suited to how they think.
+[Get started](#run-locally) · [Why Wolfbone?](#why-wolfbone) · [Explore the interface](#from-an-idea-to-a-construction) · [Contribute](#build-with-us)
 
-The name evokes an early physical medium for recording patterns. It honours the long human practice of giving thought an external form and leaves the project open to forms of mathematical reasoning beyond our own.
+![Wolfbone's mathematics library: twelve areas on an open canvas, with an area index and an inspector that explains how to explore.](docs/images/mathematics-map.png)
 
-Wolfbone is being prepared for a public launch under the [MIT licence](LICENSE), with Atmai maintaining the project and participation and reuse at the centre of its development.
+*The working mathematics library. Enter through an area, a familiar word, a symbol, or a construction.*
 
-Mathematics is a shared pursuit. Our contribution is to help more minds work with it.
+## A map you can think with
 
-## Project status
+Mathematics holds an extraordinary body of ideas. Different minds need different ways to reach them.
 
-Wolfbone includes a preconfigured mathematics library at `/explore` and an editable finite-function workspace at `/`. The library connects 166 original explanations and 669 labelled relationships across twelve foundational areas with a locally imported index of 321,329 mathlib declarations and 8,489 source modules. Sixteen editable examples connect exploration to construction. The [library decision](docs/architecture/0002-preconfigured-mathematics.md) explains the content, source snapshot, and preservation boundaries.
+Wolfbone makes those ideas explorable through a shared map. Choose a concept as your anchor. See what it uses, what uses it, and which assumptions give it meaning. Move between ordinary language, notation, diagrams, and working examples as you investigate.
 
-The finite workspace supports creating labelled collections, assigning outputs, composing compatible functions, and comparing results through diagrams and tables. Its canvas shows expanded collection cards. A general category-level construction engine remains future work.
+Our aim is to **democratize the exploration of mathematical thought**: to make understanding, construction, and contribution accessible through the forms that help people reason.
 
-The selected stack is Next.js 16, React 19, React Flow, shadcn components, Tailwind CSS, and Motion, using Atmai's 1.2 visual language. The [first-workspace decision](docs/architecture/0001-first-workspace.md) records exact versions, licence boundaries, and acceptance requirements. The mathematical model stays independent of the canvas.
+| Explained ideas | Labelled relationships | Mathematical areas | Editable constructions |
+| :---: | :---: | :---: | :---: |
+| **166** | **669** | **12** | **16** |
 
-The workspace is single-user and browser-local, with local storage and a versioned JSON export/import format. Each preconfigured example has a separate saved workspace. The mathlib import contains names, kinds, module imports, and source links; formal statements and proofs remain upstream. No Lean runtime, MMT adapter, or external proof-checking service is connected. Exact finite evaluation has a narrower scope than a general mathematical proof.
+Alongside the foundations map, a local catalogue connects **321,329 mathlib declaration records** across **8,489 source modules** to their original documentation. These imported records contain names, kinds, and module relationships; formal statements and proofs remain upstream.
 
-The [first-workspace verification](docs/verification/0001-first-workspace.md) records the original acceptance boundary. The [library verification](docs/verification/0002-preconfigured-mathematics.md) records the expanded implementation's checks. GitHub Actions is configured; local records do not establish a remote CI run or deployment.
+## Why Wolfbone?
+
+The name honours the **notched wolf bone from Dolní Věstonice**, in present-day Czechia. Its marks have been interpreted as tallying, although their original purpose remains uncertain. Historian Jaroslav Folta discusses the object and its possible meanings in [*Věstonická vrubovka*](https://vesmir.cz/cz/casopis/archiv-casopisu/1997/cislo-6/vestonicka-vrubovka.html).
+
+For us, the name begins with the medium: a physical, three-dimensional object carrying marks. It evokes the act of giving thought an external form—something that can be revisited, compared, and shared.
+
+Wolfbone carries that idea forward. A mathematical structure may be encountered through text, symbols, a spatial arrangement, or another representation. We want people to work through the medium that helps them think, with the underlying relationships and rules available for inspection.
+
+Atmai maintains the project; we make no ownership claim over mathematics. Our commitment to openness extends to mathematical understanding wherever it may arise, including beyond our own species or world.
+
+## From an idea to a construction
+
+### 01 · Follow the relationships
+
+Search for **Function**, make it your anchor, and explore its neighbourhood. Switch between **uses and used by**, **kinds and specializations**, and **related ideas**. Each connection says what it means; the inspector retains the full list when the diagram shows a smaller view.
+
+![Function anchored between Set, which its explanation uses, and Predicate and Function composition, which use it. The inspector shows context, an example, and further connections.](docs/images/follow-an-idea.png)
+
+*A change of perspective changes the view. The underlying concept identities and relationship kinds stay explicit.*
+
+The initial map spans logic and proof, sets and functions, numbers and arithmetic, algebra, geometry, trigonometry, linear algebra, calculus and analysis, probability, statistics, discrete mathematics, and mathematical structures.
+
+### 02 · Make something and inspect what follows
+
+Open a prepared construction or build your own finite collections and functions. Assign outputs, connect elements, compose compatible functions, and compare the results on every declared input. Diagram and table represent the same mathematical document.
+
+![The finite-function canvas after changing h(a) to moon. The right-hand inspector identifies a concrete disagreement: the composed route reaches sun.](docs/images/find-a-counterexample.png)
+
+*Change one assignment. The diagram changes, and a specific input witnesses the disagreement.*
+
+The sixteen starting examples include composition, identity, injection, bijection and inverse, parity, arithmetic modulo three, Boolean operations, permutations, and finite samples of familiar functions. Each has **its own saved workspace**, with undo/redo and JSON export/import. Opening an example keeps your ordinary workspace and other examples separate.
+
+### 03 · Follow an idea back to its source
+
+The **Mathlib** view searches the bundled declaration catalogue locally. Inspect a module's direct imports, move to another module, or open the original documentation and pinned source file. Source provenance stays visible alongside the accessible explanations.
+
+The catalogue preserves module-import relationships. These have a different meaning from the editorial relationships in the foundations map and from dependencies between individual proofs.
+
+[See all five interface screenshots and their capture notes →](docs/images/README.md)
 
 ## Run locally
 
-Use Node.js 24 or newer and npm. Development also uses Node.js 26; Rust is not required.
+Use **Node.js 24 or newer** and npm. From the repository checkout:
 
 ```sh
 npm ci
 npm run dev -- --port 3100
 ```
 
-Open [the local workspace](http://127.0.0.1:3100). The development server binds to the local machine. Browser data belongs to that browser and site address; use JSON export for a portable copy before changing browsers or clearing storage.
-
-Open [the mathematics library](http://127.0.0.1:3100/explore) to start from an idea, inspect its relationships, search mathlib, or choose a working example. The bundled library is ready to use after installation; no import service, account, or external API key is required. Upstream source links require internet access.
-
-## Start here
-
-| Document | What it contains |
+| Open | Start here |
 | --- | --- |
-| [Project definition](docs/PROJECT.md) | Requirements, preservation obligations, and open questions |
-| [Related systems](docs/ECOSYSTEM.md) | MMT, OMDoc, Lean, and relevant precedents |
-| [First-medium proposal](docs/proposals/0001-first-medium.md) | The accepted first construction and inspection experience |
-| [First-workspace decision](docs/architecture/0001-first-workspace.md) | Selected stack, independent mathematical model, and acceptance scope |
-| [Local verification](docs/verification/0001-first-workspace.md) | Checked workflows, results, and remaining limits |
-| [Preconfigured mathematics](docs/architecture/0002-preconfigured-mathematics.md) | Foundations map, mathlib metadata import, and editable examples |
-| [Library verification](docs/verification/0002-preconfigured-mathematics.md) | Library integrity and exploration workflow checks |
-| [Contributing](CONTRIBUTING.md) | Ways to participate and how changes are reviewed |
-| [Governance](GOVERNANCE.md) | Atmai's stewardship and how decisions are made |
-| [Community conduct](CODE_OF_CONDUCT.md) | Expectations for working together |
-| [Security](SECURITY.md) | Reporting security concerns |
-| [Public launch](docs/PUBLIC_LAUNCH.md) | Remaining steps before opening the repository |
+| [Mathematics library](http://127.0.0.1:3100/explore) | Explore the map, search ideas and sources, or choose an example |
+| [Your workspace](http://127.0.0.1:3100) | Create and inspect finite collections and functions |
 
-## Participate
+The preconfigured library is included in the repository. Browsing its explanations and searching the local catalogue require no account or external API key. Upstream source links require internet access.
 
-Contributions can be mathematical, visual, technical, or editorial. Plain-language explanations, diagrams, accessibility feedback, and counterexamples are welcome.
+The server binds to the local machine. Workspaces are saved in the browser for that site address; export a JSON copy to carry work between browsers or keep it before clearing storage.
 
-Use [Discussions](https://github.com/ATMAI-Labs/Wolfbone/discussions) for questions and early ideas, [Issues](https://github.com/ATMAI-Labs/Wolfbone/issues) for concrete proposals or corrections, and pull requests for changes. Repository access follows its current GitHub visibility.
+## Where the project stands
+
+Wolfbone is an **early working prototype**, being prepared for public release. The current implementation provides a foundations map, a locally searchable source catalogue, and a finite-function construction engine. The broader aim is a shared mathematical environment across many media.
+
+| Working today | Boundary |
+| --- | --- |
+| Concept map, index, and context inspector | An expandable set of original explanations and editorial relationships |
+| Imported mathlib catalogue | Declaration metadata and source links; no theorem bodies or imported proof objects |
+| Editable mathematical constructions | Explicitly finite collections and functions, with exact evaluation on their inputs |
+| Diagram, table, and file representations | One finite mathematical model with layout stored separately |
+| Saved examples and personal workspace | Single-user browser storage; shared editing is future work |
+
+Lean proof checking, MMT translation, a general mathematical construction engine, and further media remain separate work ahead. Every representation or translation must state what it preserves and how that is checked.
+
+The implementation uses **Next.js 16, React 19, React Flow, shadcn, Tailwind CSS, and Motion**, with Atmai's 1.2 visual language. The mathematical data is independent of the canvas renderer. See the [workspace decision](docs/architecture/0001-first-workspace.md) and [library decision](docs/architecture/0002-preconfigured-mathematics.md) for the architecture and exact scope.
+
+**Locally checked on 7 September 2026:** 72 unit tests and 21 browser journeys passed, together with corpus integrity, type, production-build, formatting, and repository checks. The [verification record](docs/verification/0002-preconfigured-mathematics.md) describes the evidence and its limits. Local results do not report a remote CI result or a public deployment.
+
+## Build with us
+
+There are many ways to contribute:
+
+- **Explain an idea.** Add clear language, an example, and the context in which it holds.
+- **Connect the map.** Identify a dependency, classification, or relationship and say which kind it is.
+- **Make a construction.** Give people something they can change and inspect.
+- **Open another medium.** Help preserve mathematical meaning across representations.
+- **Improve access.** Contribute keyboard interaction, readable layouts, alternative presentations, or accessibility feedback.
+
+A precise question, a careful correction, or a useful diagram can be a substantial contribution. Start with [CONTRIBUTING.md](CONTRIBUTING.md), bring ideas to [Discussions](https://github.com/ATMAI-Labs/Wolfbone/discussions), or propose a concrete improvement in [Issues](https://github.com/ATMAI-Labs/Wolfbone/issues). Access follows the repository's current visibility.
+
+## Project guide
+
+| Read | For |
+| --- | --- |
+| [Project definition](docs/PROJECT.md) | Purpose, contexts, relationship kinds, and preservation obligations |
+| [Related systems](docs/ECOSYSTEM.md) | MMT, OMDoc, Lean, and other relevant work |
+| [First-medium proposal](docs/proposals/0001-first-medium.md) | The initial construction and inspection experience |
+| [First-workspace verification](docs/verification/0001-first-workspace.md) | The original finite-workspace acceptance record |
+| [Library verification](docs/verification/0002-preconfigured-mathematics.md) | Corpus, exploration, and construction checks |
+| [Governance](GOVERNANCE.md) · [Community conduct](CODE_OF_CONDUCT.md) | Stewardship and participation |
+| [Security](SECURITY.md) · [Public launch](docs/PUBLIC_LAUNCH.md) | Reporting concerns and preparing the project for release |
 
 ## Development checks
 
-After installing the locked dependencies, run:
+After installing the locked dependencies:
 
 ```sh
 npm run test
@@ -71,17 +135,20 @@ npm run typecheck
 npm run build
 npx playwright install chromium
 npm run test:e2e
+npm run format:check
 sh scripts/check.sh
 ```
 
-Unit tests exercise the finite mathematical core and workspace archive. Type checking and the production build check application integrity. Playwright exercises browser workflows against that build on port 3100; the [contribution guide](CONTRIBUTING.md#before-submitting-a-pull-request) explains browser setup. The repository script checks Markdown style, relative links, YAML syntax, and Git whitespace. These checks are configured in GitHub Actions on Node.js 24; their presence here does not report a passing run.
+The [contribution guide](CONTRIBUTING.md#before-submitting-a-pull-request) explains browser setup. Corpus verification runs offline; see the [import procedure](docs/architecture/0002-preconfigured-mathematics.md#source-snapshot-and-reproducibility) before updating the reviewed source snapshot. File checks and successful builds do not establish mathematical claims.
 
-Library tests also cover relationship kinds, seed examples, and metadata search. `npm run library:verify` validates the bundled corpus offline. See the [import procedure](docs/architecture/0002-preconfigured-mathematics.md#source-snapshot-and-reproducibility) before updating its reviewed source snapshot.
+## Licence and acknowledgements
 
-Browser acceptance additionally needs to demonstrate construction, composition, comparison, keyboard use, persistence, and import/export. Neither a build nor a screenshot establishes those interactions, a general theorem, or translation fidelity to another mathematical system.
+Wolfbone's original code, explanations, examples, and project documentation use the **[MIT licence](LICENSE)**. Contributions do not require copyright assignment.
 
-## Licence and attribution
+Imported mathlib metadata retains **Apache-2.0**, with the upstream licence, source revision, and attribution included. Dependencies and fonts retain their own terms. See [third-party notices](THIRD_PARTY_NOTICES.md).
 
-Wolfbone's original code and accompanying project documentation are covered by the [MIT licence](LICENSE). Contributing does not require copyright assignment. Dependencies and fonts retain their own terms; see [third-party notices](THIRD_PARTY_NOTICES.md). Linking to a mathematical library does not import or relicense it.
+This project builds on the work of the mathematical community, the Lean and mathlib contributors, and the maintainers of the open-source tools beneath its interface. The [ecosystem notes](docs/ECOSYSTEM.md) distinguish systems we study from capabilities we have integrated.
+
+**Mathematics is a shared pursuit. Our contribution is another way into it.**
 
 Maintained by [Atmai](https://github.com/ATMAI-Labs).

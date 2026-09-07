@@ -1,0 +1,48 @@
+{
+  "capturedAt": "2026-09-07T06:07:15.671Z",
+  "applicationRevision": "1348908c8fb98c5d3bcb7035b79754d7978af82e",
+  "method": "Unaltered browser screenshots of the local production build in an isolated browser context; original example data only.",
+  "browser": "Chrome 152.0.7977.77",
+  "screenshots": [
+    {
+      "file": "mathematics-map.png",
+      "description": "The twelve-area overview, with real counts from the bundled mathematics library.",
+      "route": "/explore",
+      "width": 1512,
+      "height": 982,
+      "sha256": "63ea94dbf46b6a37a7ef221fec3e4f11f1773133cef7fa57c80f809987ce473e"
+    },
+    {
+      "file": "follow-an-idea.png",
+      "description": "Function anchored between the ideas it uses and examples of ideas that use it.",
+      "route": "/explore?concept=function",
+      "width": 1512,
+      "height": 982,
+      "sha256": "5526b2f604c0bfe349286bae8117e7fc99e4f146a06534e8cd7e2da733fe6743"
+    },
+    {
+      "file": "inspect-the-source.png",
+      "description": "A local mathlib search and the source module, including its direct imports and pinned source link.",
+      "route": "/explore?concept=function",
+      "width": 1512,
+      "height": 982,
+      "sha256": "fc21d59eb264d110186a49e3e5030202e2e85cf7f0556da96d35f75234c0385d"
+    },
+    {
+      "file": "construct-and-compare.png",
+      "description": "The original finite-function workspace checks the direct function against composition on every input.",
+      "route": "/",
+      "width": 1512,
+      "height": 982,
+      "sha256": "16b071019322e9542b3e34514676288cef012657cf9862b665b61a2e1c10d620"
+    },
+    {
+      "file": "find-a-counterexample.png",
+      "description": "Changing h(a) to moon produces the concrete disagreement with the composed route, which reaches sun.",
+      "route": "/",
+      "width": 1512,
+      "height": 982,
+      "sha256": "451c9365e8c30fea03fa1ee0f9a94e2d7785b518960dfee0058d78d86adfa91a"
+    }
+  ]
+}
