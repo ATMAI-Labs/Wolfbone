@@ -8,7 +8,7 @@ import MarkdownIt from 'markdown-it';
 import { parseDocument } from 'yaml';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const excluded = new Set(['.git', 'node_modules', 'work', '.cache', 'dist', 'build', '.venv']);
+const excluded = new Set(['.git', 'node_modules', 'work', '.cache', 'dist', 'build', '.venv', '.next', 'out', 'test-results', 'playwright-report']);
 const markdown = new MarkdownIt();
 const errors = [];
 let markdownFiles = 0;

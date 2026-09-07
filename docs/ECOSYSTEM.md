@@ -1,6 +1,6 @@
 # Related systems and interoperability
 
-**Status:** source-linked orientation for architectural discussion. These notes do not establish end-to-end compatibility, completed integrations, or a final technology selection. Wolfbone's requirements are recorded in the [project definition](PROJECT.md).
+**Status:** source-linked orientation. The [first browser workspace](architecture/0001-first-workspace.md) is implemented with scoped [local verification](verification/0001-first-workspace.md). These notes do not establish end-to-end compatibility or completed integrations with the mathematical systems below. Wolfbone's requirements are recorded in the [project definition](PROJECT.md).
 
 ## Distinctions that matter
 
@@ -52,7 +52,13 @@ For any eventual connection, proof checking and interpretation fidelity are sepa
 | [ProofWidgets4](https://github.com/leanprover-community/ProofWidgets4) | Interactive components within Lean, including visual integrations. | How can an interaction correspond to a declared construction and an inspectable checking result? |
 | [Verso](https://github.com/leanprover/verso) and [doc-gen4](https://github.com/leanprover/doc-gen4) | Authoring and generated documentation in the Lean ecosystem. | How should explanations remain connected to definitions, dependencies, and evidence? |
 
-These are references for design and possible integration. Wolfbone has not selected its first medium or committed to one of these tools.
+These are references for design and possible integration. Their presence here does not mean they are installed or connected to Wolfbone.
+
+### First canvas context
+
+Wolfbone selected React Flow 12.11.6 for its initial browser workspace on 7 September 2026. Its [MIT core](https://github.com/xyflow/xyflow/blob/main/LICENSE), [custom React nodes](https://reactflow.dev/learn/customization/custom-nodes), and [keyboard and ARIA support](https://reactflow.dev/learn/advanced-use/accessibility) fit interactive mathematical cards and explicitly labelled relationships. The mathematical model remains separate from canvas state.
+
+Excalidraw, tldraw, AntV X6, Rete, Konva, and PixiJS were compared for this decision. The [canvas assessment](architecture/0001-first-workspace.md#canvas-assessment) records their fit and licence boundaries, including tldraw's current non-MIT SDK and Rete's separately restricted advanced plugins. Repository activity and package versions are dated observations; they are not claims of measured popularity growth or a GitHub Trending rank.
 
 ## Problems and evaluation resources
 
@@ -64,4 +70,4 @@ These are references for design and possible integration. Wolfbone has not selec
 
 MMT and Math-in-the-Middle are strong candidates for the initial architectural comparison. Lean/mathlib provide a possible first body of formal content. Flexiformal methods address existing material with incomplete formalisation, while visual tools offer concrete interaction examples.
 
-The next architectural decision should name a bounded mathematical example, its supported constructions, and the fidelity obligations for its representations. That decision can then be checked against these systems' actual capabilities.
+The accepted [first medium](proposals/0001-first-medium.md) names finite labelled sets and functions, composition, exact comparison, and diagram/table preservation. Future import and checking decisions must specify their own supported content, source versions, licence terms, and interpretation guarantees.

@@ -21,3 +21,10 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Next.js and local checks
+.next/
+out/
+*.tsbuildinfo
+playwright-report/
+test-results/

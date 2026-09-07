@@ -1,6 +1,6 @@
 {
   "globs": ["**/*.md"],
-  "ignores": ["node_modules/**", "work/**", "dist/**", "build/**"],
+  "ignores": ["node_modules/**", "work/**", "dist/**", "build/**", ".next/**", "test-results/**", "playwright-report/**", "out/**"],
   "config": {
     "default": true,
     "MD013": false,

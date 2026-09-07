@@ -2,7 +2,7 @@
 
 *Mathematical thought, across media.*
 
-**Status:** working specification. The repository establishes the project; it does not yet provide an implemented mathematical framework or a verified translation pipeline. The first operable medium and implementation remain open decisions.
+**Status:** working specification with an implemented first local prototype. The browser workspace for finite labelled sets and functions has passed the scoped [local verification](verification/0001-first-workspace.md). The [first-workspace decision](architecture/0001-first-workspace.md) records the selected stack and acceptance scope. A general mathematical framework and verified translation pipeline remain future work.
 
 ## Purpose
 
@@ -14,7 +14,7 @@ Wolfbone is maintained by Atmai. Its original code and accompanying documentatio
 
 ## Working definition
 
-A small, declared core specifies how entities, contexts, relationships, and constructions can be introduced. Its assumptions and rules are inspectable. The particular primitives and a proof of their minimality have not been selected or established.
+A small, declared core specifies how entities, contexts, relationships, and constructions can be introduced. Its assumptions and rules are inspectable. The first implementation declares finite sets and functions; the general primitive vocabulary and a proof of its minimality have not been selected or established.
 
 A **context** records the vocabulary, definitions, assumptions, and rules under which its contents operate. Different contexts may use different names, conventions, or foundations. Explicit mappings connect contexts and state which structures, operations, or conclusions they preserve.
 
@@ -54,12 +54,21 @@ A partial view may intentionally omit information while retaining a link to the 
 
 A checked proof establishes a formal statement under its assumptions and checking rules. It does not, by itself, establish that an imported sentence or diagram was interpreted faithfully.
 
-## Decisions still open
+## First implementation
 
-- The primitive vocabulary, formal foundation, and representation of the core.
-- The first operable medium and the first mathematical fragment it will support.
-- Which relationships and constructions that fragment requires.
-- The equality or equivalence used for each preservation claim.
+The first medium is a browser workspace using Next.js, React, React Flow, shadcn components, Tailwind CSS, Motion, and Atmai's 1.2 visual language. It supports creating finite labelled sets and total functions, composing compatible pairs, inspecting their mappings, and comparing functions exhaustively. Composition requires the same middle set identity; labels alone do not identify sets. Comparison uses the same declared domain and codomain and checks every input.
+
+Diagram and table represent one mathematical model, with layout stored separately. A versioned JSON archive and browser-local storage support saving and reopening the workspace. This first implementation is single-user. The shared mathematical environment is the broader project aim; repository sharing does not provide multiuser synchronisation.
+
+The current diagram uses expanded collection cards and element assignments. A collapsed collection/category overview remains a future representation. A composition's selected source pair is interface state; adding its result stores a finite mapping snapshot, not a persistent derivation linked to source-function IDs.
+
+These decisions do not include full mathlib or MMT integration, an external proof service, or all of mathematics. References and source links preserve a route into existing work without claiming a completed adapter. Rust or another runtime may be considered when a concrete capability or profiling warrants it.
+
+## Decisions still open beyond the first workspace
+
+- The primitive vocabulary, formal foundation, and representation of the general core.
+- The next mathematical fragments and media, and the relationships and constructions they require.
+- The equality or equivalence used for preservation claims outside the initial finite setting.
 - How contexts with different logics will be connected and checked.
 - Which existing systems to adopt, extend, or connect through adapters.
 - How to make navigation, construction, and verification accessible across different needs and media.
@@ -68,4 +77,4 @@ Logic and mathematics are the intended initial scope. Expansion into other disci
 
 ## Relationship to existing work
 
-MMT, OMDoc, flexiformal mathematics, Math-in-the-Middle, proof assistants, and visual mathematical tools provide substantial prior art. Wolfbone will investigate their existing capabilities before selecting its architecture. The [ecosystem notes](ECOSYSTEM.md) record their relevant roles and the limits of the comparison.
+MMT, OMDoc, flexiformal mathematics, Math-in-the-Middle, proof assistants, and visual mathematical tools provide substantial prior art. Wolfbone investigates their capabilities before selecting an integration or extending its architecture. The [ecosystem notes](ECOSYSTEM.md) record their relevant roles and the limits of the comparison.
