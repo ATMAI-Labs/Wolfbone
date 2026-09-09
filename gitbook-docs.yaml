@@ -1,0 +1,55 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+version: 1
+site:
+  title: Wolfbone
+  structure:
+    - type: section
+      key: section-project
+      title: Project
+      description: Repository front matter — introduction, contributing, conduct, governance, security, and third-party notices.
+      path: project
+      default: true
+      children:
+        - type: space
+          key: space-overview
+          title: Overview
+          path: overview
+          default: true
+          content:
+            directory: ./
+            language: en
+    - type: section
+      key: section-documentation
+      title: Documentation
+      description: Project definition, architecture decisions, proposals, and verification records.
+      path: documentation
+      children:
+        - type: space
+          key: space-project-definition
+          title: Project definition
+          path: project-definition
+          default: true
+          content:
+            directory: ./docs
+            language: en
+        - type: space
+          key: space-architecture-decisions
+          title: Architecture decisions
+          path: architecture
+          content:
+            directory: ./docs/architecture
+            language: en
+        - type: space
+          key: space-proposals
+          title: Proposals
+          path: proposals
+          content:
+            directory: ./docs/proposals
+            language: en
+        - type: space
+          key: space-verification-records
+          title: Verification records
+          path: verification
+          content:
+            directory: ./docs/verification
+            language: en
