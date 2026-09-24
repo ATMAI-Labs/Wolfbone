@@ -28,6 +28,8 @@ Using the local app in the in-app browser:
 
 Source review found and corrected viewport recentering during ordinary card selection, accidental blank-card creation when double-clicking existing node headers, and the need to fit ink-only imports. Pointer selection is now separate from explicit requests to find or create a card.
 
+**Follow-up, 24 September 2026:** Later browser checks reproduced a separate focus problem when returning from Table to Diagram: a previously focused card was selected and briefly took keyboard focus. The [Phase 0 stabilisation record](0004-phase0-stabilization.md) covers that repair and its browser journey. The source-review observation above did not establish view-switch focus behaviour.
+
 ## Limits
 
 This evaluates numeric expressions, not variables or general symbolic equations. Supported operators are addition, subtraction, multiplication, and division with parentheses. The parser never executes user source as code. Result sizes and drawing sizes are bounded. No external proof checker is connected.

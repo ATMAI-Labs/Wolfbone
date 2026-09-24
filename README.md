@@ -80,7 +80,7 @@ npm run dev -- --port 3100
 
 The preconfigured library is included in the repository. Browsing its explanations and searching the local catalogue require no account or external API key. Upstream source links require internet access.
 
-The server binds to the local machine. Workspaces are saved in the browser for that site address; export a JSON copy to carry work between browsers or keep it before clearing storage.
+The server binds to the local machine. Workspaces are saved in the browser for that site address; export a JSON copy to carry work between browsers or keep it before clearing storage. Current saves use the `wolfbone.workspace` browser key (with a separate key per example). Earlier `wolfbone.workspace.v1` saves are read without rewriting their stored text. If a browser save is unreadable, from a newer format, or changed in another tab, automatic saving pauses. When the saved text is available, it can be downloaded before an explicit import or restore. If another tab clears storage, export the open workspace before leaving.
 
 ## Where the project stands
 
@@ -100,7 +100,7 @@ Lean proof checking, MMT translation, a general mathematical construction engine
 
 The implementation uses **Next.js 16, React 19, React Flow, shadcn, Tailwind CSS, and Motion**, with Atmai's 1.2 visual language. The mathematical data is independent of the canvas renderer. See the [workspace decision](docs/architecture/0001-first-workspace.md) and [library decision](docs/architecture/0002-preconfigured-mathematics.md) for the architecture and exact scope.
 
-**Locally checked on 7 September 2026:** 72 unit tests and 21 browser journeys passed, together with corpus integrity, type, production-build, formatting, and repository checks. The [verification record](docs/verification/0002-preconfigured-mathematics.md) describes the evidence and its limits. Local results do not report a remote CI result or a public deployment.
+**Locally checked on 24 September 2026:** 105 unit tests and 35 browser journeys passed, together with corpus integrity, type, production-build, formatting, and repository checks. The [Phase 0 verification record](docs/verification/0004-phase0-stabilization.md) describes the save protection, Undo grouping, and canvas repairs covered by these checks. The earlier [7 September record](docs/verification/0002-preconfigured-mathematics.md) remains a historical result: 72 unit tests and 21 browser journeys passed then. Neither local result reports a remote CI run or public deployment.
 
 ## Build with us
 
@@ -121,8 +121,10 @@ A precise question, a careful correction, or a useful diagram can be a substanti
 | [Project definition](docs/PROJECT.md) | Purpose, contexts, relationship kinds, and preservation obligations |
 | [Related systems](docs/ECOSYSTEM.md) | MMT, OMDoc, Lean, and other relevant work |
 | [First-medium proposal](docs/proposals/0001-first-medium.md) | The initial construction and inspection experience |
+| [Full Wolfbone roadmap](docs/proposals/0002-roadmap.md) | Proposed phases and acceptance gates; future integrations remain proposals |
 | [First-workspace verification](docs/verification/0001-first-workspace.md) | The original finite-workspace acceptance record |
 | [Library verification](docs/verification/0002-preconfigured-mathematics.md) | Corpus, exploration, and construction checks |
+| [Canvas verification](docs/verification/0003-canvas-arithmetic.md) · [Phase 0 verification](docs/verification/0004-phase0-stabilization.md) | Arithmetic/ink prototype and subsequent workspace stabilisation |
 | [Governance](GOVERNANCE.md) · [Community conduct](CODE_OF_CONDUCT.md) | Stewardship and participation |
 | [Security](SECURITY.md) · [Public launch](docs/PUBLIC_LAUNCH.md) | Reporting concerns and preparing the project for release |
 
