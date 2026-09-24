@@ -32,6 +32,14 @@ import type {
 } from '@xyflow/react';
 import { validateFunction } from '@/lib/math/model';
 import type { FiniteFunction, FiniteSet, MathDocument } from '@/lib/math/model';
+import type { ArithmeticCard, InkStroke } from '@/lib/workspace/archive';
+import {
+  ArithmeticNode,
+  ARITHMETIC_NODE_WIDTH,
+  ARITHMETIC_NODE_HEIGHT,
+  type ArithmeticCanvasNode,
+} from './arithmetic-node';
+import { InkLayer } from './ink-layer';
 import '@xyflow/react/dist/style.css';
 import './canvas.css';
 
@@ -50,6 +58,16 @@ export type FunctionCanvasProps = {
   onTrace: (trace: Trace) => void;
   composite?: FiniteFunction;
   viewMode: 'all' | 'selected' | 'composite';
+  arithmetic: ArithmeticCard[];
+  ink: InkStroke[];
+  drawing: boolean;
+  focusRequest: { id: string } | null;
+  fitRequest: number;
+  onAddArithmetic: (expression: string, position?: Point) => void;
+  onChangeArithmetic: (id: string, expression: string) => void;
+  onRemoveArithmetic: (id: string) => void;
+  onSelectArithmetic: (id: string) => void;
+  onStroke: (points: Point[]) => void;
 };
 
 const NODE_WIDTH = 176;
@@ -90,6 +108,7 @@ type CollectionData = {
   onKeyboardHandle: (kind: 'source' | 'target', setId: string, elementId: string) => void;
 };
 type CollectionNode = Node<CollectionData, 'collection'>;
+type WorkspaceNode = CollectionNode | ArithmeticCanvasNode;
 
 type MappingData = {
   functionId: string;
@@ -290,7 +309,7 @@ const Mapping = memo(function Mapping(props: EdgeProps<MappingEdge>) {
   );
 });
 
-const nodeTypes = { collection: Collection };
+const nodeTypes = { collection: Collection, arithmetic: ArithmeticNode };
 const edgeTypes = { mapping: Mapping };
 
 function CanvasControls({ bounds }: { bounds: Rect }) {
@@ -327,7 +346,7 @@ function CanvasControls({ bounds }: { bounds: Rect }) {
         type="button"
         className="function-canvas__fit"
         onClick={() => void fitBounds(bounds, { padding: 0.06, duration: 0 })}
-        aria-label="Fit all collections and arrows in view"
+        aria-label="Fit everything in view"
       >
         Fit view
       </button>
@@ -346,7 +365,18 @@ function Canvas({
   onTrace,
   composite,
   viewMode,
+  arithmetic,
+  ink,
+  drawing,
+  focusRequest,
+  fitRequest,
+  onAddArithmetic,
+  onChangeArithmetic,
+  onRemoveArithmetic,
+  onSelectArithmetic,
+  onStroke,
 }: FunctionCanvasProps) {
+  const focusedArithmeticId = focusRequest?.id ?? null;
   const [localPositions, setLocalPositions] = useState<Positions>(positions);
   const positionsRef = useRef(localPositions);
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(() => new Set());
@@ -470,7 +500,7 @@ function Canvas({
     [activeFunction, connect, document.sets, editable, pendingInput],
   );
 
-  const nodes = useMemo<CollectionNode[]>(() => {
+  const collectionNodes = useMemo<CollectionNode[]>(() => {
     const validation = activeFunction ? validateFunction(activeFunction, document.sets) : undefined;
     const missing = new Set(validation?.missing ?? []);
     return layout.map(({ set, position }) => {
@@ -519,6 +549,46 @@ function Canvas({
     selectedNodes,
     traceState.elements,
   ]);
+
+  const arithmeticNodes = useMemo<ArithmeticCanvasNode[]>(
+    () =>
+      arithmetic.map((card, index) => ({
+        id: canvasNodeId(card.id),
+        type: 'arithmetic',
+        position: localPositions[card.id] ?? { x: index * 340, y: 600 },
+        width: ARITHMETIC_NODE_WIDTH,
+        height: ARITHMETIC_NODE_HEIGHT,
+        extent: [
+          [-POSITION_LIMIT, -POSITION_LIMIT],
+          [POSITION_LIMIT + ARITHMETIC_NODE_WIDTH, POSITION_LIMIT + ARITHMETIC_NODE_HEIGHT],
+        ],
+        dragHandle: '.arithmetic-card__header',
+        selected: selectedNodes.has(canvasNodeId(card.id)),
+        deletable: false,
+        focusable: true,
+        ariaLabel: `Arithmetic ${card.expression || 'blank expression'}. Drag the header to arrange.`,
+        data: {
+          ...card,
+          onChange: onChangeArithmetic,
+          onRemove: onRemoveArithmetic,
+          onSelect: onSelectArithmetic,
+          autoFocus: card.id === focusedArithmeticId,
+        },
+      })),
+    [
+      arithmetic,
+      localPositions,
+      selectedNodes,
+      onChangeArithmetic,
+      onRemoveArithmetic,
+      onSelectArithmetic,
+      focusedArithmeticId,
+    ],
+  );
+  const nodes = useMemo<WorkspaceNode[]>(
+    () => [...collectionNodes, ...arithmeticNodes],
+    [collectionNodes, arithmeticNodes],
+  );
 
   const edges = useMemo<MappingEdge[]>(() => {
     const bottom = layout.length
@@ -600,18 +670,38 @@ function Canvas({
   ]);
 
   const bounds = useMemo<Rect>(() => {
-    const left = layout.length ? Math.min(...layout.map(({ position }) => position.x)) : 0;
-    const top = layout.length ? Math.min(...layout.map(({ position }) => position.y)) : 80;
-    const right = layout.length
-      ? Math.max(...layout.map(({ position }) => position.x + NODE_WIDTH))
-      : NODE_WIDTH;
+    const boxes = [
+      ...layout.map(({ set, position }) => ({
+        ...position,
+        width: NODE_WIDTH,
+        height: nodeHeight(set),
+      })),
+      ...arithmeticNodes.map((node) => ({
+        ...node.position,
+        width: ARITHMETIC_NODE_WIDTH,
+        height: ARITHMETIC_NODE_HEIGHT,
+      })),
+      ...ink.map((stroke) => {
+        const xs = stroke.points.map((p) => p.x),
+          ys = stroke.points.map((p) => p.y);
+        return {
+          x: Math.min(...xs),
+          y: Math.min(...ys),
+          width: Math.max(...xs) - Math.min(...xs),
+          height: Math.max(...ys) - Math.min(...ys),
+        };
+      }),
+    ];
+    const left = boxes.length ? Math.min(...boxes.map((box) => box.x)) : 0;
+    const top = boxes.length ? Math.min(...boxes.map((box) => box.y)) : 80;
+    const right = boxes.length ? Math.max(...boxes.map((box) => box.x + box.width)) : NODE_WIDTH;
     const parallelExtent = Math.max(
       0,
       ...edges.map((edge) => Math.abs(edge.data?.parallelOffset ?? 0)),
     );
-    const bottom = layout.length
+    const bottom = boxes.length
       ? Math.max(
-          ...layout.map(({ set, position }) => position.y + nodeHeight(set) + parallelExtent),
+          ...boxes.map((box) => box.y + box.height + parallelExtent),
           ...edges.filter((edge) => edge.data?.direct).map((edge) => edge.data!.laneY + 24),
         )
       : 300;
@@ -621,16 +711,18 @@ function Canvas({
       width: right - left + 176,
       height: bottom - top + 96 + parallelExtent,
     };
-  }, [edges, layout]);
+  }, [edges, layout, arithmeticNodes, ink]);
 
-  const onNodesChange = useCallback<OnNodesChange<CollectionNode>>(
+  const onNodesChange = useCallback<OnNodesChange<WorkspaceNode>>(
     (changes) => {
       const movement = changes.filter((change) => change.type === 'position' && change.position);
       if (movement.length) {
         const next = { ...positionsRef.current };
         for (const change of movement) {
           if (change.type === 'position' && change.position) {
-            const set = document.sets.find((item) => canvasNodeId(item.id) === change.id);
+            const set = [...document.sets, ...arithmetic].find(
+              (item) => canvasNodeId(item.id) === change.id,
+            );
             if (set)
               next[set.id] = {
                 x: boundPosition(change.position.x),
@@ -657,7 +749,7 @@ function Canvas({
           return next;
         });
     },
-    [document.sets, onPositionsChange],
+    [document.sets, arithmetic, onPositionsChange],
   );
 
   const onEdgesChange = useCallback<OnEdgesChange<MappingEdge>>(
@@ -672,26 +764,37 @@ function Canvas({
     [edges, onSelectFunction, selectedFunctionId, viewMode],
   );
 
-  const { fitBounds, viewportInitialized } = useReactFlow<CollectionNode, MappingEdge>();
+  const { fitBounds, setCenter, screenToFlowPosition, viewportInitialized } = useReactFlow<
+    WorkspaceNode,
+    MappingEdge
+  >();
   const membershipKey = useMemo(
     () =>
-      JSON.stringify(
-        document.sets.map((set) => [set.id, set.elements.map((element) => element.id)]),
-      ),
-    [document.sets],
+      JSON.stringify([
+        ...document.sets.map((set) => [set.id, set.elements.map((element) => element.id)]),
+        ...arithmetic.map((card) => card.id),
+      ]),
+    [document.sets, arithmetic],
   );
   const latestBounds = useRef(bounds);
   const fittedMembership = useRef<string | null>(null);
   useEffect(() => {
     latestBounds.current = bounds;
   }, [bounds]);
+  useEffect(() => {
+    if (!fitRequest || !viewportInitialized) return;
+    const frame = requestAnimationFrame(() => {
+      void fitBounds(latestBounds.current, { padding: 0.06, duration: 0 });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [fitRequest, fitBounds, viewportInitialized]);
   const onInit = useCallback(() => {
     void fitBounds(latestBounds.current, { padding: 0.06, duration: 0 }).then((fitted) => {
       if (fitted) fittedMembership.current = membershipKey;
     });
   }, [fitBounds, membershipKey]);
   useEffect(() => {
-    if (document.sets.length === 0) {
+    if (document.sets.length === 0 && arithmetic.length === 0) {
       fittedMembership.current = membershipKey;
       return;
     }
@@ -702,7 +805,15 @@ function Canvas({
       // Card dimensions are explicit; wait for the viewport and commit the changed layout.
       secondFrame = requestAnimationFrame(() => {
         if (fittedMembership.current === membershipKey) return;
-        void fitBounds(latestBounds.current, { padding: 0.06, duration: 0 }).then((fitted) => {
+        const focused = focusedArithmeticId ? positionsRef.current[focusedArithmeticId] : undefined;
+        const fit = focused
+          ? setCenter(
+              focused.x + ARITHMETIC_NODE_WIDTH / 2,
+              focused.y + ARITHMETIC_NODE_HEIGHT / 2,
+              { zoom: 1, duration: 0 },
+            )
+          : fitBounds(latestBounds.current, { padding: 0.06, duration: 0 });
+        void fit.then((fitted) => {
           if (fitted && !cancelled) fittedMembership.current = membershipKey;
         });
       });
@@ -712,7 +823,25 @@ function Canvas({
       cancelAnimationFrame(firstFrame);
       cancelAnimationFrame(secondFrame);
     };
-  }, [document.sets.length, fitBounds, membershipKey, viewportInitialized]);
+  }, [
+    document.sets.length,
+    arithmetic.length,
+    fitBounds,
+    setCenter,
+    focusedArithmeticId,
+    membershipKey,
+    viewportInitialized,
+  ]);
+
+  useEffect(() => {
+    const position = focusedArithmeticId ? positionsRef.current[focusedArithmeticId] : undefined;
+    if (viewportInitialized && position)
+      void setCenter(
+        position.x + ARITHMETIC_NODE_WIDTH / 2,
+        position.y + ARITHMETIC_NODE_HEIGHT / 2,
+        { zoom: 1, duration: 0 },
+      );
+  }, [focusRequest, setCenter, viewportInitialized]);
   const onEdgeClick = useCallback(
     (_event: unknown, edge: MappingEdge) => {
       if (viewMode !== 'composite' && edge.data) onSelectFunction(edge.data.functionId);
@@ -727,8 +856,33 @@ function Canvas({
   }, []);
 
   return (
-    <div className="function-canvas" onKeyDown={onKeyDown}>
-      <ReactFlow<CollectionNode, MappingEdge>
+    <div
+      className="function-canvas"
+      onKeyDown={onKeyDown}
+      onDoubleClick={(event) => {
+        const target = event.target as HTMLElement;
+        if (
+          !drawing &&
+          target.closest('.react-flow__pane') &&
+          !target.closest('.react-flow__node, .react-flow__edge, .react-flow__panel')
+        ) {
+          onAddArithmetic('', screenToFlowPosition({ x: event.clientX, y: event.clientY }));
+        }
+      }}
+      onDragOver={(event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'copy';
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+        const expression =
+          event.dataTransfer.getData('application/x-wolfbone-expression') ||
+          event.dataTransfer.getData('text/plain');
+        if (expression && expression.length <= 512)
+          onAddArithmetic(expression, screenToFlowPosition({ x: event.clientX, y: event.clientY }));
+      }}
+    >
+      <ReactFlow<WorkspaceNode, MappingEdge>
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
@@ -743,14 +897,17 @@ function Canvas({
         minZoom={MIN_ZOOM}
         maxZoom={2}
         deleteKeyCode={null}
-        nodesConnectable={editable}
+        nodesConnectable={editable && !drawing}
+        nodesDraggable={!drawing}
+        panOnDrag={!drawing}
+        zoomOnDoubleClick={false}
         edgesReconnectable={false}
         nodesFocusable
         edgesFocusable
         disableKeyboardA11y={false}
         connectionLineStyle={{ stroke: SIGNAL, strokeWidth: 2 }}
         colorMode="light"
-        aria-label="Finite functions canvas"
+        aria-label="Mathematical canvas"
         ariaLabelConfig={{
           'node.a11yDescription.default':
             "Press Enter to select a collection. Use arrow keys to move selected collections, or Shift and arrows for larger steps. Tab enters the collection's trace buttons and connection handles. Moving collections changes only their arrangement.",
@@ -767,6 +924,7 @@ function Canvas({
           color="#d9d9d5"
           bgColor="#f4f4f2"
         />
+        <InkLayer strokes={ink} drawing={drawing} onStroke={onStroke} />
         <Panel position="top-left" className="function-canvas__guidance">
           {pendingInput ? (
             <span>{connectionMessage}</span>
@@ -774,7 +932,9 @@ function Canvas({
             <span>
               {viewMode === 'composite'
                 ? 'Computed composition · inspect each input'
-                : 'Drag a collection to arrange · choose an element to trace'}
+                : drawing
+                  ? 'Pencil · draw with your mouse or stylus'
+                  : 'Double-click empty space to type · drag cards to arrange'}
             </span>
           )}
         </Panel>

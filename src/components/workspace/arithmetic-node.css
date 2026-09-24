@@ -1,0 +1,218 @@
+.arithmetic-card {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border: 1px solid var(--canvas-control, #737370);
+  border-radius: 6px;
+  background: var(--canvas-card, #fbfbfa);
+  color: var(--canvas-ink, #0a0a0a);
+  font-family: var(--font-sans, 'Archivo', sans-serif);
+}
+
+.arithmetic-card--selected {
+  border-color: var(--canvas-signal, #6c2bee);
+  box-shadow: 0 0 0 1px var(--canvas-signal, #6c2bee);
+}
+
+.arithmetic-card__header {
+  display: flex;
+  flex: 0 0 43px;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0 10px 0 14px;
+  border-bottom: 1px solid var(--canvas-line, #d9d9d5);
+  border-radius: 5px 5px 0 0;
+  cursor: grab;
+}
+
+.arithmetic-card__header:active {
+  cursor: grabbing;
+}
+
+.arithmetic-card__header > span {
+  color: var(--canvas-muted, #5c5c58);
+  font-size: 11px;
+  font-weight: 550;
+  letter-spacing: 0.07em;
+}
+
+.arithmetic-card__remove {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--canvas-muted, #5c5c58);
+  cursor: pointer;
+}
+
+.arithmetic-card__remove:hover {
+  background: var(--canvas-soft, #ece3ff);
+  color: var(--canvas-signal, #6c2bee);
+}
+
+.arithmetic-card__body {
+  display: grid;
+  flex: 1;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  padding: 14px;
+}
+
+.arithmetic-card__field label,
+.arithmetic-card__label {
+  display: block;
+  color: var(--canvas-muted, #5c5c58);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.arithmetic-card__input {
+  width: 100%;
+  height: 43px;
+  box-sizing: border-box;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--canvas-control, #737370);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 18px;
+}
+
+.arithmetic-card__input::placeholder {
+  color: var(--canvas-muted, #5c5c58);
+}
+
+.arithmetic-card__input:focus-visible,
+.arithmetic-card__remove:focus-visible,
+.arithmetic-card__explorer summary:focus-visible,
+.arithmetic-card__result output:focus-visible {
+  outline: 2px solid var(--canvas-signal, #6c2bee);
+  outline-offset: 2px;
+}
+
+.arithmetic-card__result {
+  min-width: 0;
+}
+
+.arithmetic-card__result output {
+  display: block;
+  overflow-x: auto;
+  margin-top: 3px;
+  color: var(--canvas-signal, #6c2bee);
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 32px;
+  line-height: 42px;
+  white-space: nowrap;
+}
+
+.arithmetic-card__message,
+.arithmetic-card__help,
+.arithmetic-card__exploration p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.arithmetic-card__message {
+  margin-top: 5px;
+}
+
+.arithmetic-card__help {
+  align-self: end;
+  color: var(--canvas-muted, #5c5c58);
+}
+
+.arithmetic-card__explorer {
+  min-height: 0;
+  overflow: auto;
+  padding: 2px;
+  border-top: 1px solid var(--canvas-line, #d9d9d5);
+}
+
+.arithmetic-card__explorer summary {
+  padding: 8px 0 5px;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.arithmetic-card__exploration {
+  padding: 4px 2px 7px;
+}
+
+.arithmetic-card__counters {
+  display: grid;
+  grid-template-columns: repeat(10, 10px);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.arithmetic-card__counters > span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--canvas-signal, #6c2bee);
+}
+
+.arithmetic-card__fraction {
+  overflow-wrap: anywhere;
+}
+
+.arithmetic-card__fraction > span,
+.arithmetic-card__ticks {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+}
+
+.arithmetic-card__number-line {
+  margin: 17px 5px 0;
+}
+
+.arithmetic-card__axis {
+  position: relative;
+  height: 7px;
+  border-top: 1px solid var(--canvas-control, #737370);
+  border-right: 1px solid var(--canvas-control, #737370);
+  border-left: 1px solid var(--canvas-control, #737370);
+}
+
+.arithmetic-card__marker {
+  position: absolute;
+  top: -5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--canvas-signal, #6c2bee);
+  transform: translateX(-50%);
+}
+
+.arithmetic-card__ticks {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--canvas-muted, #5c5c58);
+  font-size: 10px;
+  line-height: 16px;
+}
+
+.arithmetic-card__ticks > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arithmetic-card__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

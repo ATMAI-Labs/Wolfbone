@@ -186,3 +186,108 @@ test('history keeps at most 50 accepted prior states', () => {
   assert.equal(state.past[0].document.title, 'Revision 5');
   assert.equal(state.revision, 55);
 });
+
+test('arithmetic and pencil edits share Undo, Redo, and importable history with the existing document', () => {
+  const initial = createWorkspaceHistory();
+  const withCard = workspaceReducer(initial, {
+    type: 'edit',
+    recipe: (current) => ({
+      ...current,
+      version: 2,
+      arithmetic: [{ id: 'calc', expression: '2 + 2' }],
+      layout: { ...current.layout, calc: { x: 40, y: -20 } },
+    }),
+  });
+  const withStroke = workspaceReducer(withCard, {
+    type: 'edit',
+    recipe: (current) => ({
+      ...current,
+      ink: [
+        {
+          id: 'stroke',
+          points: [
+            { x: 4, y: 5 },
+            { x: 6, y: 7 },
+          ],
+        },
+      ],
+    }),
+  });
+  const movedAndEdited = workspaceReducer(withStroke, {
+    type: 'edit',
+    recipe: (current) => {
+      current.layout.calc = { x: 120, y: 90 };
+      current.arithmetic![0].expression = '2 + (';
+      return current;
+    },
+  });
+  assert.equal(movedAndEdited.editError, '');
+  assert.equal(movedAndEdited.revision, 3);
+  assert.deepEqual(movedAndEdited.present.document, initial.present.document);
+  assert.equal(withCard.present.arithmetic![0].expression, '2 + 2');
+  assert.deepEqual(withCard.present.layout.calc, { x: 40, y: -20 });
+  assert.equal(withCard.present.ink, undefined);
+  const undoneEdit = workspaceReducer(movedAndEdited, { type: 'undo' });
+  assert.equal(undoneEdit.present, withStroke.present);
+  const undoneInk = workspaceReducer(undoneEdit, { type: 'undo' });
+  assert.equal(undoneInk.present, withCard.present);
+  const undoneCard = workspaceReducer(undoneInk, { type: 'undo' });
+  assert.equal(undoneCard.present, initial.present);
+  assert.equal(undoneCard.present.version, 1);
+  let redone = undoneCard;
+  for (let index = 0; index < 3; index++) redone = workspaceReducer(redone, { type: 'redo' });
+  assert.equal(redone.present, movedAndEdited.present);
+  const imported = decodeImportableArchive(JSON.stringify(redone.present));
+  if (!imported.ok) assert.fail(imported.errors.join(' '));
+  assert.deepEqual(imported.value, redone.present);
+  const loaded = workspaceReducer(initial, { type: 'load', value: imported.value });
+  assert.deepEqual(loaded.present, redone.present);
+  assert.equal(loaded.revision, 0);
+});
+
+test('invalid new content cannot mutate prior states or remove a Redo branch', () => {
+  const initial = createWorkspaceHistory();
+  const changed = workspaceReducer(initial, {
+    type: 'edit',
+    recipe: (current) => ({
+      ...current,
+      version: 2,
+      arithmetic: [{ id: 'calc', expression: '2+2' }],
+      ink: [
+        {
+          id: 'stroke',
+          points: [
+            { x: 1, y: 2 },
+            { x: 3, y: 4 },
+          ],
+        },
+      ],
+    }),
+  });
+  const undone = workspaceReducer(changed, { type: 'undo' });
+  const invalid = workspaceReducer(undone, {
+    type: 'edit',
+    recipe: (current) => ({
+      ...current,
+      version: 2,
+      arithmetic: [{ id: 'A', expression: '999' }],
+    }),
+  });
+  assert.equal(invalid.present, undone.present);
+  assert.equal(invalid.future, undone.future);
+  assert.equal(invalid.revision, undone.revision);
+  assert.ok(invalid.editError);
+  const mutatedInk = workspaceReducer(changed, {
+    type: 'edit',
+    recipe: (current) => {
+      current.ink![0].points[0].x = Infinity;
+      current.arithmetic![0].expression = 'discard me';
+      return current;
+    },
+  });
+  assert.equal(mutatedInk.present, changed.present);
+  assert.equal(changed.present.ink![0].points[0].x, 1);
+  assert.equal(changed.present.arithmetic![0].expression, '2+2');
+  assert.equal(mutatedInk.revision, changed.revision);
+  assert.ok(mutatedInk.editError);
+});

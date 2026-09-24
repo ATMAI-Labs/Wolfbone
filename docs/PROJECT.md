@@ -66,6 +66,14 @@ The preconfigured [mathematics library](architecture/0002-preconfigured-mathemat
 
 This is metadata integration: no theorem headers or proof objects are imported, and Lean is not run. Full mathematical-content translation, MMT integration, an external proof service, and comprehensive mathematical coverage remain open work. Rust or another runtime may be considered when a concrete capability or profiling warrants it.
 
+### Arithmetic and drawing on the canvas
+
+The dotted canvas supports editable arithmetic cards, a draggable numeral tray, and freehand Pencil strokes from mouse, touch, or stylus input. Double-clicking empty space creates an expression card. Text is evaluated as ordinary exact arithmetic; a sketch remains ink. Handwriting recognition, symbolic equation solving, and arithmetic dependency connections are not implemented.
+
+Cards store their source expressions and stable identities; their displayed results are recomputed. Layout positions and ink points use canvas coordinates. Version 2 workspace archives retain this content alongside the finite mathematical document. Browser storage, JSON import/export, and the existing validated Undo/Redo history preserve all of it. Legacy version 1 archives and plain finite documents remain importable. Moving a card changes its layout only; panning and zooming preserve ink coordinates. The function table continues to show finite functions.
+
+The arithmetic parser supports integers, finite decimals, parentheses, and addition, subtraction, multiplication, and division with ordinary precedence. Reduced rational values preserve exact results; non-terminating decimals are displayed as fractions. Input and result sizes are bounded. Division by zero and unsupported notation produce explicit errors. This evaluator is unit-tested code, not a Lean proof service or a general symbolic algebra system.
+
 ## Decisions still open beyond the first workspace
 
 - The primitive vocabulary, formal foundation, and representation of the general core.

@@ -1,0 +1,82 @@
+.canvas-writing-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+}
+.canvas-tool-choice {
+  display: flex;
+  gap: 4px;
+}
+.canvas-tool-choice [aria-pressed='true'] {
+  color: var(--signal);
+  border-color: var(--signal);
+  background: var(--signal-soft);
+}
+.canvas-writing-tools form {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  min-width: 220px;
+}
+.canvas-writing-tools input {
+  min-width: 0;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--control);
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  background: var(--background);
+}
+.canvas-number-hint {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  margin: 8px 0;
+}
+.canvas-number-palette {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin: 10px 0;
+}
+.canvas-number-palette button {
+  min-height: 34px;
+  border: 1px solid var(--control);
+  border-radius: 4px;
+  font: 18px var(--font-mono);
+  background: var(--card);
+  cursor: grab;
+}
+.canvas-number-palette button:hover {
+  color: var(--signal);
+  border-color: var(--signal);
+}
+.canvas-expression-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.canvas-inspector-result {
+  font-size: 32px;
+  overflow-wrap: anywhere;
+}
+.canvas-math-tips {
+  list-style: disc;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 14px 0 24px;
+}
+@media (max-width: 620px) {
+  .canvas-writing-tools {
+    padding: 8px 12px;
+  }
+  .canvas-writing-tools form {
+    flex-basis: 100%;
+  }
+}

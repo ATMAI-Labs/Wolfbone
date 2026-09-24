@@ -76,7 +76,7 @@ npm run dev -- --port 3100
 | Open | Start here |
 | --- | --- |
 | [Mathematics library](http://127.0.0.1:3100/explore) | Explore the map, search ideas and sources, or choose an example |
-| [Your workspace](http://127.0.0.1:3100) | Create and inspect finite collections and functions |
+| [Your workspace](http://127.0.0.1:3100) | Type arithmetic cards, drag numerals, draw with Pencil, and inspect finite collections and functions on one canvas |
 
 The preconfigured library is included in the repository. Browsing its explanations and searching the local catalogue require no account or external API key. Upstream source links require internet access.
 
@@ -91,6 +91,8 @@ Wolfbone is an **early working prototype**, being prepared for public release. T
 | Concept map, index, and context inspector | An expandable set of original explanations and editorial relationships |
 | Imported mathlib catalogue | Declaration metadata and source links; no theorem bodies or imported proof objects |
 | Editable mathematical constructions | Explicitly finite collections and functions, with exact evaluation on their inputs |
+| Arithmetic expressions | Integers, finite decimals, fractions, four arithmetic operations, and parentheses; exact rational evaluation within declared size limits |
+| Arithmetic and freehand canvas | Editable calculating cards and mouse/stylus ink share browser save, Undo/Redo, and version 2 JSON export; handwriting remains a drawing |
 | Diagram, table, and file representations | One finite mathematical model with layout stored separately |
 | Saved examples and personal workspace | Single-user browser storage; shared editing is future work |
 

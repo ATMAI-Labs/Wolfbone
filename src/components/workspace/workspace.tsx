@@ -15,6 +15,8 @@ import {
   Layers,
   Link2,
   Plus,
+  Pencil,
+  MousePointer2,
   Redo2,
   RotateCcw,
   Undo2,
@@ -46,6 +48,11 @@ import { ComparisonResult } from './comparison-result';
 import { MappingEditor, signature, elementLabel } from './mapping-editor';
 import type { Playground } from '@/lib/library/playgrounds';
 import { STORAGE_KEY } from '@/lib/workspace/archive';
+import type { ArithmeticCard, InkStroke } from '@/lib/workspace/archive';
+import { evaluateArithmetic } from '@/lib/math/arithmetic';
+import './canvas-tools.css';
+const NO_ARITHMETIC: ArithmeticCard[] = [];
+const NO_INK: InkStroke[] = [];
 const FunctionCanvas = dynamic(() => import('./function-canvas'), {
   ssr: false,
   loading: () => (
@@ -97,6 +104,17 @@ export default function Workspace({ playground }: { playground?: Playground }) {
     playground ? `${STORAGE_KEY}.example.${playground.id}` : STORAGE_KEY,
   );
   const { document, positions, setDocument, setPositions } = workspace;
+  const arithmetic = workspace.archive.arithmetic ?? NO_ARITHMETIC;
+  const ink = workspace.archive.ink ?? NO_INK;
+  const [mathInput, setMathInput] = useState('');
+  const [canvasTool, setCanvasTool] = useState<'move' | 'pencil'>('move');
+  const [selectedArithmeticId, setSelectedArithmeticId] = useState<string | null>(null);
+  const [arithmeticFocus, setArithmeticFocus] = useState<{ id: string } | null>(null);
+  const [fitRequest, setFitRequest] = useState(0);
+  const selectedArithmetic = arithmetic.find((card) => card.id === selectedArithmeticId);
+  const arithmeticResult = selectedArithmetic
+    ? evaluateArithmetic(selectedArithmetic.expression)
+    : null;
   const [selectedId, setSelectedId] = useState(initialSelected);
   const selected = document.functions.find((f) => f.id === selectedId) ?? document.functions[0];
   const [tab, setTab] = useState('diagram');
@@ -122,10 +140,90 @@ export default function Workspace({ playground }: { playground?: Playground }) {
   const inputSet = document.sets.find((s) => s.id === selected?.domainId);
   const selectedSet = document.sets.find((s) => s.id === selectedSetId);
   const chooseFunction = useCallback((id: string) => {
+    setSelectedArithmeticId(null);
     setSelectedId(id);
     setSelectedSetId(null);
     setViewMode((mode) => (mode === 'composite' ? 'all' : mode));
   }, []);
+  const chooseArithmetic = useCallback((id: string) => {
+    setSelectedArithmeticId(id);
+    setSelectedSetId(null);
+    setCanvasTool('move');
+    setTab('diagram');
+  }, []);
+  const addArithmetic = useCallback(
+    (expression: string, position?: { x: number; y: number }) => {
+      if (arithmetic.length >= 50) {
+        toast.error('This canvas supports up to 50 expressions.');
+        return;
+      }
+      const id = `arithmetic-${crypto.randomUUID()}`;
+      workspace.edit((current) => {
+        const cards = current.arithmetic ?? [];
+        const point = position ?? {
+          x: (cards.length % 4) * 340,
+          y:
+            Math.max(
+              600,
+              ...current.document.sets.map(
+                (set) => (current.layout[set.id]?.y ?? 0) + 200 + set.elements.length * 54,
+              ),
+            ) +
+            Math.floor(cards.length / 4) * 370,
+        };
+        return {
+          ...current,
+          version: 2,
+          arithmetic: [...cards, { id, expression }],
+          layout: { ...current.layout, [id]: point },
+        };
+      });
+      chooseArithmetic(id);
+      setArithmeticFocus({ id });
+    },
+    [arithmetic.length, workspace.edit, chooseArithmetic],
+  );
+  const changeArithmetic = useCallback(
+    (id: string, expression: string) => {
+      workspace.edit((current) => ({
+        ...current,
+        arithmetic: (current.arithmetic ?? []).map((card) =>
+          card.id === id ? { ...card, expression } : card,
+        ),
+      }));
+    },
+    [workspace.edit],
+  );
+  const removeArithmetic = useCallback(
+    (id: string) => {
+      workspace.edit((current) => {
+        const layout = { ...current.layout };
+        delete layout[id];
+        return {
+          ...current,
+          layout,
+          arithmetic: (current.arithmetic ?? []).filter((card) => card.id !== id),
+        };
+      });
+      setSelectedArithmeticId((current) => (current === id ? null : current));
+    },
+    [workspace.edit],
+  );
+  const addStroke = useCallback(
+    (points: { x: number; y: number }[]) => {
+      if (ink.length >= 100) {
+        toast.error('This canvas supports 100 strokes. Undo or clear some ink to keep drawing.');
+        return;
+      }
+      const id = `ink-${crypto.randomUUID()}`;
+      workspace.edit((current) => ({
+        ...current,
+        version: 2,
+        ink: [...(current.ink ?? []), { id, points }],
+      }));
+    },
+    [ink.length, workspace.edit],
+  );
   const changeMapping = useCallback(
     (id: string, input: string, output: string) => {
       setDocument((doc) => ({
@@ -205,12 +303,15 @@ export default function Workspace({ playground }: { playground?: Playground }) {
     try {
       const result = workspace.importText(await file.text());
       if (result.ok) {
+        setArithmeticFocus(null);
+        setFitRequest((value) => value + 1);
         setSelectedId(result.value.document.functions[0]?.id ?? '');
         setPair({
           first: result.value.document.functions[0]?.id ?? '',
           second: result.value.document.functions[1]?.id ?? '',
         });
         setSelectedSetId(null);
+        setSelectedArithmeticId(null);
         setTrace(null);
         setCompareActive(false);
         setViewMode('all');
@@ -239,10 +340,13 @@ export default function Workspace({ playground }: { playground?: Playground }) {
     return () => window.removeEventListener('keydown', keyboard);
   }, [workspace.undo, workspace.redo, exportWorkspace]);
   function reset() {
+    setArithmeticFocus(null);
+    setFitRequest((value) => value + 1);
     workspace.restoreExample();
     setSelectedId(initialSelected);
     setPair(initialPair);
     setSelectedSetId(null);
+    setSelectedArithmeticId(null);
     setTrace(null);
     setViewMode('all');
     setCompareActive(false);
@@ -253,7 +357,7 @@ export default function Workspace({ playground }: { playground?: Playground }) {
       <>
         <div className="library-top">
           <h2>In this workspace</h2>
-          <p>Finite collections & functions</p>
+          <p>Numbers, sketches, collections & functions</p>
           {playground && (
             <details className="starting-example">
               <summary>About this starting example</summary>
@@ -270,6 +374,53 @@ export default function Workspace({ playground }: { playground?: Playground }) {
             </details>
           )}
         </div>
+        <section className="library-section canvas-number-library">
+          <h3>Numbers & expressions</h3>
+          <p className="canvas-number-hint">Click or drag a number onto the canvas.</p>
+          <div className="canvas-number-palette">
+            {['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
+              <button
+                key={digit}
+                draggable
+                aria-label={`Add number ${digit} to canvas`}
+                onClick={() => addArithmetic(digit)}
+                onDragStart={(event) => {
+                  event.dataTransfer.setData('application/x-wolfbone-expression', digit);
+                  event.dataTransfer.effectAllowed = 'copy';
+                }}
+              >
+                {digit}
+              </button>
+            ))}
+          </div>
+          <Button
+            variant="outline"
+            className="new-object"
+            onClick={() => addArithmetic('')}
+            disabled={arithmetic.length >= 50}
+          >
+            <Plus />
+            New expression
+          </Button>
+          <div className="object-list">
+            {arithmetic.map((card) => (
+              <button
+                key={card.id}
+                className={cn('library-item', selectedArithmeticId === card.id && 'is-active')}
+                aria-label={`Find expression ${card.expression || 'blank'}`}
+                onClick={() => {
+                  chooseArithmetic(card.id);
+                  setArithmeticFocus({ id: card.id });
+                }}
+              >
+                <span className="math canvas-expression-name">
+                  {card.expression || 'Write here…'}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+        <Separator />
         <section className="library-section">
           <h3>Collections</h3>
           <div className="object-list">
@@ -278,6 +429,7 @@ export default function Workspace({ playground }: { playground?: Playground }) {
                 key={s.id}
                 className={cn('library-item', selectedSetId === s.id && 'is-active')}
                 onClick={() => {
+                  setSelectedArithmeticId(null);
                   setSelectedSetId(s.id);
                   setTrace(null);
                 }}
@@ -472,8 +624,8 @@ export default function Workspace({ playground }: { playground?: Playground }) {
               <Tabs value={tab} onValueChange={setTab} className="workspace-tabs">
                 <div className="workspace-toolbar">
                   <div>
-                    <h1>Follow the structure.</h1>
-                    <p>Every input. One output.</p>
+                    <h1>Make room for a thought.</h1>
+                    <p>Type, draw, and move things around.</p>
                   </div>
                   <div className="view-actions">
                     <TabsList aria-label="Representation">
@@ -487,6 +639,64 @@ export default function Workspace({ playground }: { playground?: Playground }) {
                       Compose
                     </Button>
                   </div>
+                </div>
+                <div className="canvas-writing-tools" aria-label="Canvas writing tools">
+                  <div className="canvas-tool-choice">
+                    <Button
+                      variant="outline"
+                      aria-pressed={canvasTool === 'move'}
+                      onClick={() => {
+                        setCanvasTool('move');
+                        setTab('diagram');
+                      }}
+                    >
+                      <MousePointer2 />
+                      Move
+                    </Button>
+                    <Button
+                      variant="outline"
+                      aria-pressed={canvasTool === 'pencil'}
+                      onClick={() => {
+                        setCanvasTool('pencil');
+                        setTab('diagram');
+                      }}
+                    >
+                      <Pencil />
+                      Pencil
+                    </Button>
+                  </div>
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      if (mathInput.trim()) {
+                        addArithmetic(mathInput);
+                        setMathInput('');
+                      }
+                    }}
+                  >
+                    <input
+                      aria-label="Math to add to canvas"
+                      placeholder="Type 2 + 2…"
+                      value={mathInput}
+                      maxLength={512}
+                      onChange={(event) => setMathInput(event.target.value)}
+                    />
+                    <Button
+                      type="submit"
+                      variant="outline"
+                      disabled={!mathInput.trim() || arithmetic.length >= 50}
+                    >
+                      Add to canvas
+                    </Button>
+                  </form>
+                  {ink.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => workspace.edit((current) => ({ ...current, ink: [] }))}
+                    >
+                      Clear ink
+                    </Button>
+                  )}
                 </div>
                 <div className="canvas-context">
                   <label htmlFor="canvas-scope">Show</label>
@@ -539,6 +749,16 @@ export default function Workspace({ playground }: { playground?: Playground }) {
                     onTrace={setTrace}
                     composite={composite}
                     viewMode={viewMode}
+                    arithmetic={arithmetic}
+                    ink={ink}
+                    drawing={canvasTool === 'pencil'}
+                    focusRequest={arithmeticFocus}
+                    fitRequest={fitRequest}
+                    onAddArithmetic={addArithmetic}
+                    onChangeArithmetic={changeArithmetic}
+                    onRemoveArithmetic={removeArithmetic}
+                    onSelectArithmetic={chooseArithmetic}
+                    onStroke={addStroke}
                   />
                 </TabsContent>
                 <TabsContent value="table" className="table-panel">
@@ -620,8 +840,9 @@ export default function Workspace({ playground }: { playground?: Playground }) {
                     </>
                   ) : (
                     <span>
-                      Move a collection to change the view. Edit a connection to change the
-                      function.
+                      {canvasTool === 'pencil'
+                        ? 'Draw with your mouse or stylus. Undo removes the last stroke. Handwriting stays as ink.'
+                        : 'Double-click the grid to write. Drag a card by its heading. Use Pencil to sketch.'}
                     </span>
                   )}
                 </div>
@@ -635,12 +856,46 @@ export default function Workspace({ playground }: { playground?: Playground }) {
               aria-label="Function inspector"
             >
               <motion.div
-                key={selectedSet?.id ?? selected?.id ?? 'empty'}
+                key={selectedArithmetic?.id ?? selectedSet?.id ?? selected?.id ?? 'empty'}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.16 }}
               >
-                {selectedSet ? (
+                {selectedArithmetic ? (
+                  <>
+                    <p className="inspector-label">On your canvas</p>
+                    <h2 className="math inspector-title">
+                      {selectedArithmetic.expression || 'A new expression'}
+                    </h2>
+                    <p className="muted inspector-description">
+                      Edit the card directly. Its answer updates as you type.
+                    </p>
+                    {arithmeticResult?.ok && (
+                      <div className="ink-bay">
+                        <h3>Result</h3>
+                        <p className="math canvas-inspector-result">{arithmeticResult.formatted}</p>
+                      </div>
+                    )}
+                    <Separator />
+                    <h3>Things to try</h3>
+                    <ul className="canvas-math-tips">
+                      <li>Change a number or an operation.</li>
+                      <li>Try brackets: (2 + 2) × 3.</li>
+                      <li>Open “Explore this number” on the card.</li>
+                      <li>Use Pencil to sketch beside it.</li>
+                    </ul>
+                    <p className="muted">
+                      Addition, subtraction, multiplication, division, and exact fractions are
+                      supported.
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => removeArithmetic(selectedArithmetic.id)}
+                    >
+                      Remove expression
+                    </Button>
+                  </>
+                ) : selectedSet ? (
                   <>
                     <p className="inspector-label">Inspect a collection</p>
                     <h2 className="math inspector-title">{selectedSet.name}</h2>
@@ -780,7 +1035,7 @@ export default function Workspace({ playground }: { playground?: Playground }) {
               {workspace.saveStatus}
             </span>
             <span>
-              Finite workspace <span aria-hidden="true">·</span> v0.1
+              Canvas workspace <span aria-hidden="true">·</span> v0.2
             </span>
           </footer>
           {construction ? (

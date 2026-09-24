@@ -11,3 +11,16 @@ Read [README.md](README.md) and [docs/PROJECT.md](docs/PROJECT.md) before propos
 - Keep changes focused and preserve other contributors' work. Do not introduce an application framework, proof foundation, external service, or runtime by accident through a documentation change.
 - For documentation and repository changes, run `npm ci` and `sh scripts/check.sh`. These checks validate files and configuration, not mathematics. Add appropriate checks when executable mathematics is introduced.
 - Do not change visibility, publish packages, deploy sites, or announce releases unless requested.
+
+<!-- The framework manages the following heading independently. -->
+<!-- markdownlint-disable MD025 -->
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+<!-- markdownlint-enable MD025 -->
