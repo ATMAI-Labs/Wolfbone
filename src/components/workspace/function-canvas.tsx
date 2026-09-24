@@ -62,9 +62,11 @@ export type FunctionCanvasProps = {
   ink: InkStroke[];
   drawing: boolean;
   focusRequest: { id: string } | null;
+  onFocusConsumed: () => void;
   fitRequest: number;
   onAddArithmetic: (expression: string, position?: Point) => void;
   onChangeArithmetic: (id: string, expression: string) => void;
+  onEndArithmeticEditing: () => void;
   onRemoveArithmetic: (id: string) => void;
   onSelectArithmetic: (id: string) => void;
   onStroke: (points: Point[]) => void;
@@ -369,9 +371,11 @@ function Canvas({
   ink,
   drawing,
   focusRequest,
+  onFocusConsumed,
   fitRequest,
   onAddArithmetic,
   onChangeArithmetic,
+  onEndArithmeticEditing,
   onRemoveArithmetic,
   onSelectArithmetic,
   onStroke,
@@ -570,8 +574,10 @@ function Canvas({
         data: {
           ...card,
           onChange: onChangeArithmetic,
+          onEndEditing: onEndArithmeticEditing,
           onRemove: onRemoveArithmetic,
           onSelect: onSelectArithmetic,
+          onFocusConsumed,
           autoFocus: card.id === focusedArithmeticId,
         },
       })),
@@ -580,8 +586,10 @@ function Canvas({
       localPositions,
       selectedNodes,
       onChangeArithmetic,
+      onEndArithmeticEditing,
       onRemoveArithmetic,
       onSelectArithmetic,
+      onFocusConsumed,
       focusedArithmeticId,
     ],
   );
@@ -871,14 +879,16 @@ function Canvas({
       }}
       onDragOver={(event) => {
         event.preventDefault();
-        event.dataTransfer.dropEffect = 'copy';
+        event.dataTransfer.dropEffect =
+          !drawing && event.dataTransfer.types.includes('application/x-wolfbone-expression')
+            ? 'copy'
+            : 'none';
       }}
       onDrop={(event) => {
         event.preventDefault();
-        const expression =
-          event.dataTransfer.getData('application/x-wolfbone-expression') ||
-          event.dataTransfer.getData('text/plain');
-        if (expression && expression.length <= 512)
+        if (drawing) return;
+        const expression = event.dataTransfer.getData('application/x-wolfbone-expression');
+        if (/^[0-9]$/.test(expression))
           onAddArithmetic(expression, screenToFlowPosition({ x: event.clientX, y: event.clientY }));
       }}
     >

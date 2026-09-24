@@ -1,13 +1,13 @@
 import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-const saveKey = 'wolfbone.workspace.v1';
+const saveKey = 'wolfbone.workspace';
 async function stored(page: Page) {
   await expect(page.getByRole('status').filter({ hasText: 'Saved in this browser' })).toBeVisible();
   return page.evaluate((key) => JSON.parse(localStorage.getItem(key)!), saveKey);
 }
 async function open(page: Page) {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Follow the structure.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Make room for a thought.' })).toBeVisible();
   await expect(page.locator('.react-flow__node')).toHaveCount(3);
 }
 test('loads a real diagram without runtime errors and exposes an exact counterexample', async ({
@@ -49,7 +49,7 @@ test('table edits, diagram labels, persistence and file round trips agree', asyn
     page.getByRole('button', { name: 'Select function f: f(b) = 1', exact: true }),
   ).toBeVisible();
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Follow the structure.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Make room for a thought.' })).toBeVisible();
   await page.getByRole('tab', { name: 'Table', exact: true }).click();
   await expect(page.getByLabel('Table f output for b', { exact: true })).toHaveValue('1');
   const downloading = page.waitForEvent('download');
@@ -90,7 +90,7 @@ test('moving and tracing a collection preserves mathematics and survives reload'
   await page.getByRole('button', { name: 'Clear traced path' }).click();
   await expect(page.locator('.function-collection__row--traced')).toHaveCount(0);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Follow the structure.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Make room for a thought.' })).toBeVisible();
   expect((await stored(page)).layout).toEqual(moved.layout);
   expect((await stored(page)).document).toEqual(before.document);
 });
@@ -299,7 +299,9 @@ test('mapping labels stay unique when imported identifiers contain separators', 
   await expect(field.locator('select')).toBeFocused();
 });
 
-test('an unreadable browser save is preserved until an accepted edit', async ({ page }) => {
+test('an unreadable browser save survives ordinary edits until an explicit restore', async ({
+  page,
+}) => {
   await page.addInitScript((key) => localStorage.setItem(key, '{unreadable'), saveKey);
   await open(page);
   await expect(
@@ -307,9 +309,13 @@ test('an unreadable browser save is preserved until an accepted edit', async ({ 
   ).toBeVisible();
   expect(await page.evaluate((key) => localStorage.getItem(key), saveKey)).toBe('{unreadable');
   await page.getByLabel('h output for a', { exact: true }).selectOption('moon');
+  await expect(page.getByLabel('h output for a', { exact: true })).toHaveValue('moon');
+  expect(await page.evaluate((key) => localStorage.getItem(key), saveKey)).toBe('{unreadable');
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.getByRole('button', { name: 'Restore example', exact: true }).click();
   const current = await stored(page);
   expect(current.document.functions.find((fn: { id: string }) => fn.id === 'h').mapping.a).toBe(
-    'moon',
+    'sun',
   );
   await expect(page.locator('.storage-alert')).toHaveCount(0);
 });

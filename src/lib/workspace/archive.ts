@@ -14,7 +14,10 @@ export type WorkspaceArchive = {
   arithmetic?: ArithmeticCard[];
   ink?: InkStroke[];
 };
-export const STORAGE_KEY = 'wolfbone.workspace.v1';
+/** The active browser save key stays stable as the archive format evolves. */
+export const STORAGE_KEY = 'wolfbone.workspace';
+/** Older builds only know this key. Never write to it from a newer build. */
+export const LEGACY_STORAGE_KEY = 'wolfbone.workspace.v1';
 export const MAX_ARCHIVE_BYTES = 2 * 1024 * 1024;
 export const WORKSPACE_CONTENT_LIMITS = Object.freeze({
   arithmeticCards: 50,

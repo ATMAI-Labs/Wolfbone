@@ -141,56 +141,67 @@ export default function Workspace({ playground }: { playground?: Playground }) {
   const selectedSet = document.sets.find((s) => s.id === selectedSetId);
   const chooseFunction = useCallback((id: string) => {
     setSelectedArithmeticId(null);
+    setArithmeticFocus(null);
     setSelectedId(id);
     setSelectedSetId(null);
     setViewMode((mode) => (mode === 'composite' ? 'all' : mode));
   }, []);
   const chooseArithmetic = useCallback((id: string) => {
+    setArithmeticFocus(null);
     setSelectedArithmeticId(id);
     setSelectedSetId(null);
     setCanvasTool('move');
     setTab('diagram');
   }, []);
+  const consumeArithmeticFocus = useCallback(() => setArithmeticFocus(null), []);
   const addArithmetic = useCallback(
-    (expression: string, position?: { x: number; y: number }) => {
-      if (arithmetic.length >= 50) {
+    (expression: string, position?: { x: number; y: number }): boolean => {
+      const current = workspace.archive;
+      const cards = current.arithmetic ?? [];
+      if (cards.length >= 50) {
         toast.error('This canvas supports up to 50 expressions.');
-        return;
+        return false;
       }
       const id = `arithmetic-${crypto.randomUUID()}`;
-      workspace.edit((current) => {
-        const cards = current.arithmetic ?? [];
-        const point = position ?? {
-          x: (cards.length % 4) * 340,
-          y:
-            Math.max(
-              600,
-              ...current.document.sets.map(
-                (set) => (current.layout[set.id]?.y ?? 0) + 200 + set.elements.length * 54,
-              ),
-            ) +
-            Math.floor(cards.length / 4) * 370,
-        };
-        return {
-          ...current,
-          version: 2,
-          arithmetic: [...cards, { id, expression }],
-          layout: { ...current.layout, [id]: point },
-        };
+      const point = position ?? {
+        x: (cards.length % 4) * 340,
+        y:
+          Math.max(
+            600,
+            ...current.document.sets.map(
+              (set) => (current.layout[set.id]?.y ?? 0) + 200 + set.elements.length * 54,
+            ),
+          ) +
+          Math.floor(cards.length / 4) * 370,
+      };
+      const candidate = validateArchiveCandidate({
+        ...current,
+        version: 2,
+        arithmetic: [...cards, { id, expression }],
+        layout: { ...current.layout, [id]: point },
       });
+      if (!candidate.ok) {
+        toast.error(candidate.errors.slice(0, 3).join(' '));
+        return false;
+      }
+      workspace.edit(() => candidate.value);
       chooseArithmetic(id);
       setArithmeticFocus({ id });
+      return true;
     },
-    [arithmetic.length, workspace.edit, chooseArithmetic],
+    [workspace.archive, workspace.edit, chooseArithmetic],
   );
   const changeArithmetic = useCallback(
     (id: string, expression: string) => {
-      workspace.edit((current) => ({
-        ...current,
-        arithmetic: (current.arithmetic ?? []).map((card) =>
-          card.id === id ? { ...card, expression } : card,
-        ),
-      }));
+      workspace.edit(
+        (current) => ({
+          ...current,
+          arithmetic: (current.arithmetic ?? []).map((card) =>
+            card.id === id ? { ...card, expression } : card,
+          ),
+        }),
+        { kind: 'arithmetic-expression', cardId: id },
+      );
     },
     [workspace.edit],
   );
@@ -206,6 +217,7 @@ export default function Workspace({ playground }: { playground?: Playground }) {
         };
       });
       setSelectedArithmeticId((current) => (current === id ? null : current));
+      setArithmeticFocus((current) => (current?.id === id ? null : current));
     },
     [workspace.edit],
   );
@@ -258,6 +270,8 @@ export default function Workspace({ playground }: { playground?: Playground }) {
       return false;
     }
     workspace.edit(() => candidate.value);
+    setSelectedArithmeticId(null);
+    setArithmeticFocus(null);
     setSelectedSetId(set.id);
     setTab('diagram');
     toast.success(`${set.name} is in your workspace.`);
@@ -292,8 +306,21 @@ export default function Workspace({ playground }: { playground?: Playground }) {
     anchor.click();
     anchor.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    toast.success('Workspace exported: mathematics and layout.');
+    toast.success('Workspace exported: mathematics, layout, expressions, and ink.');
   }, [workspace.archive]);
+  const downloadProtectedSave = useCallback(() => {
+    if (workspace.protectedSaveText === null) return;
+    const blob = new Blob([workspace.protectedSaveText], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = window.document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'wolfbone.original-browser-save.json';
+    window.document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast.success('Original browser save downloaded.');
+  }, [workspace.protectedSaveText]);
   async function importFile(file: File | undefined) {
     if (!file) return;
     if (file.size > MAX_ARCHIVE_BYTES) {
@@ -324,22 +351,35 @@ export default function Workspace({ playground }: { playground?: Playground }) {
   useEffect(() => {
     function keyboard(event: KeyboardEvent) {
       const target = event.target as HTMLElement;
-      if (target.closest('input, textarea, select, [contenteditable="true"]')) return;
       if (!(event.metaKey || event.ctrlKey)) return;
+      const editable = target.closest('input, textarea, select, [contenteditable="true"]');
+      const arithmeticInput = target.closest('.arithmetic-card__input');
       if (event.key.toLowerCase() === 'z') {
+        if (editable && !arithmeticInput) return;
         event.preventDefault();
         if (event.shiftKey) workspace.redo();
         else workspace.undo();
+        return;
       }
+      if (editable) return;
       if (event.key.toLowerCase() === 's') {
         event.preventDefault();
         exportWorkspace();
       }
     }
-    window.addEventListener('keydown', keyboard);
-    return () => window.removeEventListener('keydown', keyboard);
+    // The arithmetic input stops bubbling so React Flow cannot treat typing as
+    // canvas commands. Capture its Undo shortcut before that boundary.
+    window.addEventListener('keydown', keyboard, true);
+    return () => window.removeEventListener('keydown', keyboard, true);
   }, [workspace.undo, workspace.redo, exportWorkspace]);
   function reset() {
+    if (
+      workspace.protectedSaveText !== null &&
+      !window.confirm(
+        'Restoring the example will replace the protected browser save. Download the original save first if you need it. Continue?',
+      )
+    )
+      return;
     setArithmeticFocus(null);
     setFitRequest((value) => value + 1);
     workspace.restoreExample();
@@ -350,7 +390,7 @@ export default function Workspace({ playground }: { playground?: Playground }) {
     setTrace(null);
     setViewMode('all');
     setCompareActive(false);
-    toast('Example opened.');
+    toast('Starting example restored; expressions and ink were reset.');
   }
   function library() {
     return (
@@ -430,6 +470,7 @@ export default function Workspace({ playground }: { playground?: Playground }) {
                 className={cn('library-item', selectedSetId === s.id && 'is-active')}
                 onClick={() => {
                   setSelectedArithmeticId(null);
+                  setArithmeticFocus(null);
                   setSelectedSetId(s.id);
                   setTrace(null);
                 }}
@@ -606,7 +647,15 @@ export default function Workspace({ playground }: { playground?: Playground }) {
           </header>
           {workspace.loadError ? (
             <Alert className="storage-alert">
-              <AlertDescription>{workspace.loadError}</AlertDescription>
+              <AlertDescription>
+                {workspace.loadError}
+                {workspace.protectedSaveText !== null ? (
+                  <Button variant="outline" onClick={downloadProtectedSave}>
+                    <Download data-icon="inline-start" />
+                    Download original browser save
+                  </Button>
+                ) : null}
+              </AlertDescription>
             </Alert>
           ) : null}
           <div className="workspace-grid">
@@ -621,7 +670,14 @@ export default function Workspace({ playground }: { playground?: Playground }) {
               {library()}
             </details>
             <main id="main-workspace" className="main-workspace" tabIndex={-1}>
-              <Tabs value={tab} onValueChange={setTab} className="workspace-tabs">
+              <Tabs
+                value={tab}
+                onValueChange={(nextTab) => {
+                  if (nextTab !== 'diagram') setArithmeticFocus(null);
+                  setTab(nextTab);
+                }}
+                className="workspace-tabs"
+              >
                 <div className="workspace-toolbar">
                   <div>
                     <h1>Make room for a thought.</h1>
@@ -669,8 +725,7 @@ export default function Workspace({ playground }: { playground?: Playground }) {
                     onSubmit={(event) => {
                       event.preventDefault();
                       if (mathInput.trim()) {
-                        addArithmetic(mathInput);
-                        setMathInput('');
+                        if (addArithmetic(mathInput)) setMathInput('');
                       }
                     }}
                   >
@@ -753,9 +808,11 @@ export default function Workspace({ playground }: { playground?: Playground }) {
                     ink={ink}
                     drawing={canvasTool === 'pencil'}
                     focusRequest={arithmeticFocus}
+                    onFocusConsumed={consumeArithmeticFocus}
                     fitRequest={fitRequest}
                     onAddArithmetic={addArithmetic}
                     onChangeArithmetic={changeArithmetic}
+                    onEndArithmeticEditing={workspace.endCoalescing}
                     onRemoveArithmetic={removeArithmetic}
                     onSelectArithmetic={chooseArithmetic}
                     onStroke={addStroke}

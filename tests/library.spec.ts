@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import type { MathlibSearchResult, MathlibSummary } from '../src/lib/library/mathlib';
 import type { WorkspaceArchive } from '../src/lib/workspace/archive';
 
-const workspaceKey = 'wolfbone.workspace.v1';
+const workspaceKey = 'wolfbone.workspace';
 const seedKey = (id: string) => `${workspaceKey}.example.${id}`;
 const inspector = (page: Page) =>
   page.getByRole('complementary', { name: 'Concept and source inspector' });
@@ -331,7 +331,7 @@ test('opening, editing, restoring and undoing an example preserves the personal 
   page,
 }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Follow the structure.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Make room for a thought.' })).toBeVisible();
   await page.getByLabel('h output for a', { exact: true }).selectOption('moon');
   const personal = await saved(page);
   expect(personal.document.functions.find((fn) => fn.id === 'h')!.mapping.a).toBe('moon');
@@ -369,7 +369,7 @@ test('opening, editing, restoring and undoing an example preserves the personal 
   expect((await saved(page, seedKey('parity'))).document).toEqual(edited.document);
 
   await page.goto('/?example=boolean-not');
-  await expect(page.getByRole('heading', { name: 'Follow the structure.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Make room for a thought.' })).toBeVisible();
   await page.getByRole('tab', { name: 'Table', exact: true }).click();
   await expect(page.getByLabel('Table not output for false', { exact: true })).toHaveValue(
     'truth-values:1',
@@ -466,7 +466,7 @@ test('unknown examples and modules return a not-found response instead of anothe
   const response = await page.goto('/?example=not-a-real-example');
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { name: '404', exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Follow the structure.' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Make room for a thought.' })).toHaveCount(0);
   const missing = await request.get('/api/library?module=Mathlib.NoSuchModule');
   expect(missing.status()).toBe(404);
   expect(await missing.json()).toEqual({ error: 'Module not found.' });

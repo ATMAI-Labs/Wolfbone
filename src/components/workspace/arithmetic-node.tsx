@@ -15,6 +15,8 @@ export type ArithmeticNodeData = {
   onChange: (id: string, expression: string) => void;
   onRemove: (id: string) => void;
   onSelect?: (id: string) => void;
+  onEndEditing?: () => void;
+  onFocusConsumed?: () => void;
   autoFocus?: boolean;
 };
 
@@ -125,7 +127,11 @@ export function ArithmeticNode({ data, selected }: NodeProps<ArithmeticCanvasNod
             className="arithmetic-card__input nodrag nopan nowheel"
             value={data.expression}
             onChange={(event) => data.onChange(data.id, event.target.value)}
-            onFocus={() => data.onSelect?.(data.id)}
+            onFocus={() => {
+              data.onSelect?.(data.id);
+              if (data.autoFocus) data.onFocusConsumed?.();
+            }}
+            onBlur={() => data.onEndEditing?.()}
             autoFocus={data.autoFocus}
             placeholder="2 + 2"
             maxLength={ARITHMETIC_LIMITS.sourceLength}

@@ -291,3 +291,161 @@ test('invalid new content cannot mutate prior states or remove a Redo branch', (
   assert.equal(mutatedInk.revision, changed.revision);
   assert.ok(mutatedInk.editError);
 });
+
+function addBlankArithmeticCard(state: ReturnType<typeof createWorkspaceHistory>) {
+  return workspaceReducer(state, {
+    type: 'edit',
+    recipe: (current) => ({
+      ...current,
+      version: 2,
+      arithmetic: [{ id: 'calc', expression: '' }],
+      layout: { ...current.layout, calc: { x: 0, y: 0 } },
+    }),
+  });
+}
+
+function typeInCard(state: ReturnType<typeof createWorkspaceHistory>, expression: string) {
+  return workspaceReducer(state, {
+    type: 'edit',
+    coalesce: { kind: 'arithmetic-expression', cardId: 'calc' },
+    recipe: (current) => ({
+      ...current,
+      arithmetic: current.arithmetic?.map((card) =>
+        card.id === 'calc' ? { ...card, expression } : card,
+      ),
+    }),
+  });
+}
+
+test('a long arithmetic typing burst is one Undo step after card creation', () => {
+  const initial = createWorkspaceHistory();
+  const created = addBlankArithmeticCard(initial);
+  let typed = created;
+  for (let length = 1; length <= 60; length += 1) {
+    typed = typeInCard(typed, '1'.repeat(length));
+  }
+  assert.equal(typed.revision, 61);
+  assert.equal(typed.past.length, 2);
+  assert.equal(typed.past[0], initial.present);
+  assert.equal(typed.past[1], created.present);
+  const undoneTyping = workspaceReducer(typed, { type: 'undo' });
+  assert.equal(undoneTyping.present, created.present);
+  assert.equal(undoneTyping.coalescing, null);
+  const undoneCreation = workspaceReducer(undoneTyping, { type: 'undo' });
+  assert.equal(undoneCreation.present, initial.present);
+  const redoneCreation = workspaceReducer(undoneCreation, { type: 'redo' });
+  const redoneTyping = workspaceReducer(redoneCreation, { type: 'redo' });
+  assert.equal(redoneTyping.present, typed.present);
+  assert.equal(redoneTyping.coalescing, null);
+  assert.equal(redoneTyping.revision, 65);
+  const typedAfterRedo = typeInCard(redoneTyping, '1'.repeat(61));
+  assert.equal(typedAfterRedo.past.length, 3, 'typing after Redo begins a new step');
+});
+
+test('blur, other edits, and a misleading grouping hint separate Undo steps', () => {
+  const created = addBlankArithmeticCard(createWorkspaceHistory());
+  const firstBurst = typeInCard(created, '2');
+  const ended = workspaceReducer(firstBurst, { type: 'end-coalescing' });
+  assert.equal(ended.revision, firstBurst.revision);
+  assert.equal(ended.present, firstBurst.present);
+  assert.equal(ended.coalescing, null);
+  const secondBurst = typeInCard(ended, '2+');
+  assert.equal(secondBurst.past.length, 3);
+  const changedMath = workspaceReducer(secondBurst, {
+    type: 'edit',
+    recipe: (current) => ({
+      ...current,
+      document: { ...current.document, title: 'After a math edit' },
+    }),
+  });
+  const thirdBurst = typeInCard(changedMath, '2+2');
+  assert.equal(thirdBurst.past.length, 5);
+  const ink = workspaceReducer(thirdBurst, {
+    type: 'edit',
+    coalesce: { kind: 'arithmetic-expression', cardId: 'calc' },
+    recipe: (current) => ({
+      ...current,
+      arithmetic: current.arithmetic?.map((card) =>
+        card.id === 'calc' ? { ...card, expression: '2+3' } : card,
+      ),
+      ink: [
+        {
+          id: 'stroke',
+          points: [
+            { x: 0, y: 0 },
+            { x: 1, y: 1 },
+          ],
+        },
+      ],
+    }),
+  });
+  assert.equal(ink.past.length, 6, 'expression plus ink cannot masquerade as typing alone');
+  assert.equal(ink.coalescing, null);
+  const imported = workspaceReducer(ink, {
+    type: 'edit',
+    recipe: () => created.present,
+  });
+  assert.equal(imported.past.length, 7, 'an import remains its own step');
+  assert.equal(workspaceReducer(imported, { type: 'undo' }).present, ink.present);
+});
+
+test('rejected typing keeps the active group, archive, revision, and Redo branch', () => {
+  const created = addBlankArithmeticCard(createWorkspaceHistory());
+  const first = typeInCard(created, '3');
+  const rejected = typeInCard(first, 'x'.repeat(513));
+  assert.equal(rejected.present, first.present);
+  assert.equal(rejected.past, first.past);
+  assert.equal(rejected.future, first.future);
+  assert.equal(rejected.revision, first.revision);
+  assert.deepEqual(rejected.coalescing, first.coalescing);
+  assert.equal(rejected.editErrorId, first.editErrorId + 1);
+  const corrected = typeInCard(rejected, '3+4');
+  assert.equal(corrected.past.length, 2);
+  assert.equal(corrected.editError, '');
+  const undone = workspaceReducer(corrected, { type: 'undo' });
+  const rejectedOnRedoBranch = typeInCard(undone, 'x'.repeat(513));
+  assert.equal(rejectedOnRedoBranch.future, undone.future);
+  assert.equal(rejectedOnRedoBranch.revision, undone.revision);
+  assert.equal(rejectedOnRedoBranch.coalescing, null);
+});
+
+test('other card and quoted document text cannot impersonate the typed card', () => {
+  const initial = createWorkspaceHistory();
+  const created = workspaceReducer(initial, {
+    type: 'edit',
+    recipe: (current) => ({
+      ...current,
+      version: 2,
+      document: {
+        ...current.document,
+        title: `Card text ${JSON.stringify({ id: 'calc', expression: '1' })}`,
+      },
+      arithmetic: [
+        { id: 'calc', expression: '1' },
+        { id: 'calc-other', expression: '1' },
+      ],
+      layout: {
+        ...current.layout,
+        calc: { x: 0, y: 0 },
+        'calc-other': { x: 10, y: 0 },
+      },
+    }),
+  });
+  const first = typeInCard(created, '1$');
+  const second = typeInCard(first, '1$$');
+  assert.equal(second.past.length, 2, 'quoted card JSON does not block a real typing burst');
+  const otherCard = workspaceReducer(second, {
+    type: 'edit',
+    coalesce: { kind: 'arithmetic-expression', cardId: 'calc' },
+    recipe: (current) => ({
+      ...current,
+      arithmetic: current.arithmetic?.map((card) =>
+        card.id === 'calc-other' ? { ...card, expression: '2' } : card,
+      ),
+    }),
+  });
+  assert.equal(otherCard.past.length, 3, 'a misleading card ID cannot combine another card');
+  assert.equal(otherCard.coalescing, null);
+  assert.equal(workspaceReducer(otherCard, { type: 'undo' }).present, second.present);
+  assert.equal(workspaceReducer(second, { type: 'undo' }).present, created.present);
+});
