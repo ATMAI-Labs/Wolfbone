@@ -70,4 +70,6 @@ Excalidraw, tldraw, AntV X6, Rete, Konva, and PixiJS were compared for this deci
 
 MMT and Math-in-the-Middle are strong candidates for the initial architectural comparison. Lean/mathlib provide a possible first body of formal content. Flexiformal methods address existing material with incomplete formalisation, while visual tools offer concrete interaction examples.
 
+The [full-Wolfbone roadmap proposal](proposals/0002-roadmap.md) names the specific ideas to test, the order of work, and the evidence required before calling an adapter or construction verified.
+
 The accepted [first medium](proposals/0001-first-medium.md) names finite labelled sets and functions, composition, exact comparison, and diagram/table preservation. Future import and checking decisions must specify their own supported content, source versions, licence terms, and interpretation guarantees.
